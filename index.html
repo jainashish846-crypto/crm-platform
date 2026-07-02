@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cyber Resilience Unified Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f5f9;
+    --panel:#ffffff;
+    --ink:#0c1024;
+    --ink-2:#1a1d36;
+    --muted:#5a607a;
+    --muted-2:#8a91aa;
+    --line:#e4e6f0;
+    --line-2:#eef0f6;
+    --brand:#a100ff;
+    --brand-2:#7400b8;
+    --brand-3:#e1c8ff;
+    --brand-bg:#fdfaff;
+    --teal:#00b4a6;
+    --teal-bg:#e6faf8;
+    --amber:#d97706;
+    --amber-bg:#fffbeb;
+    --green:#059669;
+    --green-bg:#ecfdf5;
+    --chip:#f1f3fa;
+    --radius:14px;
+    --shadow-sm:0 1px 2px rgba(12,16,36,.04),0 1px 3px rgba(12,16,36,.04);
+    --shadow:0 4px 24px -8px rgba(12,16,36,.10),0 2px 8px -2px rgba(12,16,36,.06);
+    --shadow-lg:0 24px 60px -20px rgba(12,16,36,.20),0 8px 24px -8px rgba(12,16,36,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:0;background:transparent;color:inherit}
+
+  /* ========= LOGIN PAGE ========= */
+  #page-login{position:fixed;inset:0;background:linear-gradient(135deg,#0a0018 0%,#1a0033 40%,#3d0066 70%,#7400b8 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:100}
+  #page-login::before{content:"";position:absolute;top:-200px;right:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(161,0,255,.30) 0%,transparent 70%);pointer-events:none}
+  #page-login::after{content:"";position:absolute;bottom:-200px;left:-200px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(0,180,166,.20) 0%,transparent 70%);pointer-events:none}
+  .login-card{position:relative;z-index:2;text-align:center;color:#fff;padding:40px;max-width:640px;animation:fadeIn .6s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .login-brand{display:inline-flex;align-items:center;gap:12px;margin-bottom:32px}
+  .login-brand .gt{font-size:36px;font-weight:800;color:#a100ff;line-height:1}
+  .login-brand-txt{font-size:14px;font-weight:600;letter-spacing:.10em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+  .login-title{font-size:52px;font-weight:800;letter-spacing:-.03em;line-height:1.05;margin:0 0 20px}
+  .login-taglines{display:flex;flex-direction:column;gap:8px;margin:32px 0 44px;font-size:19px;font-weight:500;color:rgba(255,255,255,.90);letter-spacing:-.01em}
+  .login-taglines .l{display:inline-flex;align-items:center;justify-content:center;gap:10px}
+  .login-taglines .l::before{content:"";width:6px;height:6px;background:var(--brand);border-radius:50%}
+  .login-btn{display:inline-flex;align-items:center;gap:10px;padding:16px 40px;background:linear-gradient(135deg,#a100ff,#7400b8);color:#fff;border:0;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 8px 32px rgba(161,0,255,.40);transition:all .2s;letter-spacing:.02em}
+  .login-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(161,0,255,.55)}
+  .login-btn svg{width:18px;height:18px}
+  .login-footer{margin-top:40px;font-size:12px;color:rgba(255,255,255,.55);letter-spacing:.04em}
+
+  /* ========= APP LAYOUT ========= */
+  #app{display:none;min-height:100vh}
+  #app.on{display:grid;grid-template-columns:260px 1fr}
+  @media(max-width:900px){#app.on{grid-template-columns:1fr}}
+
+  /* ========= SIDEBAR ========= */
+  .sidebar{background:#0f0322;color:#fff;padding:24px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  @media(max-width:900px){.sidebar{position:relative;height:auto;padding:16px 0}}
+  .sb-brand{padding:0 24px 24px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:20px;display:flex;align-items:center;gap:10px;cursor:pointer}
+  .sb-brand .gt{color:#a100ff;font-size:26px;font-weight:800;line-height:1}
+  .sb-brand-txt{font-size:14px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+  .sb-brand-sub{font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+  .sb-section{padding:0 12px;margin-bottom:20px}
+  .sb-section-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);padding:0 12px;margin-bottom:8px}
+  .sb-item{padding:10px 14px;border-radius:8px;font-size:13.5px;font-weight:500;color:rgba(255,255,255,.75);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:all .15s;margin-bottom:2px}
+  .sb-item:hover{background:rgba(255,255,255,.06);color:#fff}
+  .sb-item.on{background:linear-gradient(135deg,#7400b8,#a100ff);color:#fff;font-weight:600}
+  .sb-item .cnt{font-size:11px;background:rgba(255,255,255,.15);padding:2px 8px;border-radius:999px;font-weight:600}
+  .sb-item.on .cnt{background:rgba(255,255,255,.25)}
+  .sb-item.dev{opacity:.55}
+  .sb-item .dev-tag{font-size:9px;background:var(--amber);color:#fff;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:.04em}
+  .sb-nav{padding:0 24px;margin-top:auto;font-size:11.5px;color:rgba(255,255,255,.45);border-top:1px solid rgba(255,255,255,.08);padding-top:20px;margin-top:20px}
+  .sb-nav a{display:block;padding:6px 0;color:rgba(255,255,255,.55);cursor:pointer}
+  .sb-nav a:hover{color:#fff}
+
+  /* ========= MAIN AREA ========= */
+  .main{padding:32px 44px 60px;min-height:100vh}
+  @media(max-width:900px){.main{padding:20px 20px 40px}}
+
+  /* Breadcrumb + selected badge strip */
+  .breadcrumb{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:6px;flex-wrap:wrap}
+  .breadcrumb .b-step{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:500}
+  .breadcrumb .b-step.done{background:var(--brand-bg);border-color:var(--brand-3);color:var(--brand-2)}
+  .breadcrumb .b-step.done::before{content:"✓";font-weight:700}
+  .breadcrumb .b-step.active{background:linear-gradient(135deg,#7400b8,#a100ff);border-color:transparent;color:#fff;font-weight:600}
+  .breadcrumb .b-arrow{color:var(--muted-2);font-size:11px}
+
+  .sel-strip{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:18px 0 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .sel-strip .sl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .sel-strip .sc{font-size:12px;font-weight:600;padding:4px 10px;background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2);border-radius:999px;display:inline-flex;align-items:center;gap:6px}
+  .sel-strip .sc-off{background:var(--teal-bg);color:var(--teal)}
+  .sel-strip .change{margin-left:auto;font-size:12px;font-weight:600;color:var(--brand-2);cursor:pointer;padding:4px 12px;border-radius:6px}
+  .sel-strip .change:hover{background:var(--brand-bg)}
+
+  .page-head{margin-bottom:26px}
+  .page-title{font-size:30px;font-weight:800;letter-spacing:-.025em;margin:0 0 8px;color:var(--ink)}
+  .page-sub{font-size:14.5px;color:var(--muted);line-height:1.55;max-width:640px}
+
+  /* ========= SERVICE / OFFERING CARDS ========= */
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:28px}
+  .sel-card{background:#fff;border:2px solid var(--line);border-radius:12px;padding:20px;cursor:pointer;transition:all .18s;position:relative;display:flex;flex-direction:column;gap:8px;min-height:150px}
+  .sel-card:hover{border-color:var(--brand-3);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .sel-card.on{border-color:var(--brand);background:linear-gradient(180deg,#fdfaff 0%,#fff 100%);box-shadow:0 0 0 3px rgba(161,0,255,.10)}
+  .sel-card.dev{opacity:.65;cursor:not-allowed}
+  .sel-card.dev:hover{transform:none;box-shadow:none;border-color:var(--line)}
+  .sel-card-check{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:6px;border:2px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s}
+  .sel-card.on .sel-card-check{background:linear-gradient(135deg,#7400b8,#a100ff);border-color:transparent;color:#fff}
+  .sel-card-check svg{width:12px;height:12px;opacity:0}
+  .sel-card.on .sel-card-check svg{opacity:1}
+  .sel-card-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2);display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+  .sel-card-icon svg{width:20px;height:20px}
+  .sel-card-name{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em;line-height:1.25;padding-right:32px}
+  .sel-card-desc{font-size:12.5px;color:var(--muted);line-height:1.45;flex:1}
+  .sel-card-meta{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:600;color:var(--muted);margin-top:6px}
+  .sel-card-meta .m{display:inline-flex;align-items:center;gap:4px}
+  .sel-card .dev-badge{position:absolute;top:14px;left:14px;font-size:9px;font-weight:700;background:var(--amber-bg);color:var(--amber);padding:3px 8px;border-radius:999px;letter-spacing:.04em}
+
+  /* ========= CTA / STEP FOOTER ========= */
+  .step-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px;flex-wrap:wrap}
+  .step-back{padding:10px 20px;background:#fff;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+  .step-back:hover{border-color:var(--brand-3);color:var(--ink)}
+  .step-next{padding:12px 26px;background:linear-gradient(135deg,#7400b8,#a100ff);color:#fff;border:0;border-radius:999px;font-size:13.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(161,0,255,.28);transition:all .15s}
+  .step-next:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 28px rgba(161,0,255,.40)}
+  .step-next:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .step-next svg{width:14px;height:14px}
+  .step-footer-hint{font-size:12px;color:var(--muted);flex:1;text-align:center}
+
+  /* ========= TOOL CARDS (PAGE 3) ========= */
+  .tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:24px}
+  .tool-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;cursor:pointer;transition:all .18s;position:relative;display:flex;flex-direction:column;min-height:280px}
+  .tool-card:hover{border-color:var(--brand-3);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .tool-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .tool-card-name{font-size:20px;font-weight:800;letter-spacing:-.015em;color:var(--ink);line-height:1.2;margin:0}
+  .tool-card-acro{font-size:10.5px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-top:4px;display:block}
+  .tool-source{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.04em;white-space:nowrap}
+  .tool-source.accenture{background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2)}
+  .tool-source.partner{background:var(--amber-bg);color:var(--amber)}
+  .tool-source.global{background:var(--teal-bg);color:var(--teal)}
+  .tool-card-desc{font-size:13px;line-height:1.55;color:var(--muted);margin:6px 0 14px;flex:1}
+  .tool-card-supports{background:var(--brand-bg);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+  .tool-card-supports .lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-2);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+  .tool-card-supports .item{font-size:12px;color:var(--ink-2);padding:2px 0;display:flex;align-items:center;gap:6px;font-weight:500}
+  .tool-card-supports .item::before{content:"✓";color:var(--green);font-weight:700;flex-shrink:0}
+  .tool-card-meta{display:flex;align-items:center;gap:12px;font-size:11.5px;color:var(--muted);margin-bottom:12px;flex-wrap:wrap}
+  .tool-card-meta .m b{color:var(--ink);font-weight:600}
+  .tool-card-cta{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;background:var(--chip);color:var(--ink-2);border:1px solid var(--line);border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;margin-top:auto}
+  .tool-card-cta:hover{background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#fff;border-color:transparent}
+  .tool-card-cta svg{width:12px;height:12px}
+
+  .empty{text-align:center;padding:60px 20px;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:14px}
+  .empty .ic{font-size:44px;opacity:.4;margin-bottom:14px}
+  .empty .t{font-size:16px;font-weight:600;color:var(--ink-2);margin-bottom:4px}
+  .empty .s{font-size:13px}
+
+  /* Tool page filter bar */
+  .tool-filter-bar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:18px}
+  .tool-filter-row{margin-bottom:12px}
+  .tool-filter-row:last-child{margin-bottom:0}
+  .tool-filter-row .tf-lbl{font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .tool-filter-row .tf-pills{display:flex;flex-wrap:wrap;gap:6px}
+  .tf-pill{padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+  .tf-pill:hover{border-color:var(--brand-3);color:var(--ink)}
+  .tf-pill.on{background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#fff;border-color:transparent}
+  .tf-pill.svc-on{background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2);border-color:var(--brand-3)}
+  .tf-pill.off-on{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-bdr)}
+  .tf-pill .cnt{font-size:10px;opacity:.75}
+  .tf-clear{font-size:11px;color:var(--brand-2);cursor:pointer;font-weight:600;margin-left:8px;padding:2px 8px;border-radius:4px}
+  .tf-clear:hover{background:var(--brand-bg)}
+
+  /* ========= TOOL DETAIL (PAGE 4) ========= */
+  .detail-hero{background:linear-gradient(135deg,#1a0033 0%,#3d0066 50%,#7400b8 100%);color:#fff;border-radius:16px;padding:30px 34px;margin-bottom:24px;position:relative;overflow:hidden}
+  .detail-hero::before{content:"";position:absolute;right:-60px;top:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.10),transparent 70%);pointer-events:none}
+  .detail-hero .badge-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .detail-hero .badge-row .b{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;letter-spacing:.04em;background:rgba(255,255,255,.15);color:#fff}
+  .detail-hero .badge-row .b.dep{background:rgba(31,184,125,.25);color:#a7f3d0}
+  .detail-hero .dt-name{font-size:36px;font-weight:800;letter-spacing:-.025em;margin:0 0 6px;line-height:1.1}
+  .detail-hero .dt-acro{font-size:14px;font-weight:600;color:rgba(255,255,255,.75);letter-spacing:.02em;margin-bottom:14px}
+  .detail-hero .dt-desc{font-size:15px;line-height:1.65;color:rgba(255,255,255,.88);max-width:720px}
+  .detail-hero .dt-actions{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap}
+  .dt-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .15s}
+  .dt-btn.primary{background:#fff;color:var(--brand-2)}
+  .dt-btn.primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.20)}
+  .dt-btn.ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
+  .dt-btn.ghost:hover{background:rgba(255,255,255,.20)}
+  .dt-btn svg{width:14px;height:14px}
+
+  .detail-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+  @media(max-width:880px){.detail-grid{grid-template-columns:1fr}}
+  .detail-panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+  .detail-panel .lbl{font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .detail-panel h3{font-size:15px;font-weight:700;margin:0 0 10px;color:var(--ink)}
+
+  .dp-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .dp-metric{background:var(--brand-bg);border-radius:8px;padding:12px 14px}
+  .dp-metric .v{font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.015em}
+  .dp-metric .l{font-size:11px;color:var(--muted);margin-top:2px}
+
+  .dp-list{display:flex;flex-direction:column;gap:6px}
+  .dp-list-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);padding:6px 0}
+  .dp-list-item::before{content:"✓";color:var(--green);font-weight:700}
+
+  .dp-pills{display:flex;flex-wrap:wrap;gap:5px}
+  .dp-pill{font-size:11.5px;padding:4px 10px;background:var(--chip);border-radius:999px;color:var(--ink-2);font-weight:500}
+  .dp-pill.brand{background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2)}
+
+  .agents-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:680px){.agents-list{grid-template-columns:1fr}}
+  .agent{background:var(--bg);border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .agent .a-name{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .agent .a-desc{font-size:11px;color:var(--muted);line-height:1.4;margin-top:2px}
+  .agent .a-opt{font-size:10px;font-weight:700;color:var(--brand);background:rgba(161,0,255,.08);padding:2px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+
+  /* mobile hamburger */
+  .mobile-menu{display:none;position:sticky;top:0;z-index:10;background:#0f0322;color:#fff;padding:12px 20px;align-items:center;justify-content:space-between}
+  @media(max-width:900px){
+    .mobile-menu{display:flex}
+    .sidebar{display:none}
+    .sidebar.open{display:block;position:fixed;top:0;left:0;height:100vh;width:260px;z-index:50}
+  }
+  .mobile-menu-btn{width:34px;height:34px;background:rgba(255,255,255,.10);border-radius:8px;display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+
+<!-- ============ PAGE 0 — LOGIN ============ -->
+<div id="page-login">
+  <div class="login-card">
+    <div class="login-brand">
+      <span class="gt">&gt;</span>
+      <div style="text-align:left">
+        <div class="login-brand-txt" style="color:#fff;font-size:15px;letter-spacing:-.01em;text-transform:none">Accenture Security</div>
+        <div class="login-brand-txt">Cyber Resilience</div>
+      </div>
+    </div>
+    <h1 class="login-title">Cyber Resilience<br/>Unified Console</h1>
+    <div class="login-taglines">
+      <div class="l">One Console</div>
+      <div class="l">Multiple Services</div>
+      <div class="l">Unified Asset Access</div>
+    </div>
+    <button class="login-btn" onclick="enterConsole()">
+      Enter Console
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+    <div class="login-footer">Accenture · Cyber Resilience Practice · Collaborative Portfolio</div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app">
+  <!-- Mobile top bar -->
+  <div class="mobile-menu">
+    <div style="display:flex;align-items:center;gap:8px"><span style="color:#a100ff;font-size:22px;font-weight:800">&gt;</span><span style="font-weight:700;font-size:14px">Cyber Resilience</span></div>
+    <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand" onclick="goToStep(1)">
+      <span class="gt">&gt;</span>
+      <div>
+        <div class="sb-brand-txt">Cyber Resilience</div>
+        <div class="sb-brand-sub">Unified Console</div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-lbl">Services</div>
+      <div id="sb-services"></div>
+    </div>
+
+    <div class="sb-nav">
+      <a onclick="goToStep(1)">↺ Reset selections</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="main-content"></main>
+</div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const SERVICES = [
+  {id:"secure-code",name:"Secure the Code",desc:"SAST, SCA, Supply Chain Security and SBOM management across development pipelines.",icon:"code",status:"live",foot:"AWARE, TrustCode & SCA Guard · 16 Agents · 2 Clients · 30% Optimization"},
+  {id:"secure-sdlc",name:"Secure SDLC",desc:"DevSecOps automation and secure design reviews with STRIDE-based threat modelling.",icon:"sdlc",status:"live",foot:"ADI & AITM · 13 Agents · 2 Clients · 60% Optimization"},
+  {id:"ctem",name:"Threat Exposure Management",desc:"Continuous vulnerability scanning, DAST, attack surface management and remediation factory.",icon:"exposure",status:"live",foot:"AWARE & VMScout · 10 Agents · 2 Clients · 30% Optimization"},
+  {id:"pentest",name:"Penetration Testing",desc:"Web, API, mobile, thick client, AI/LLM, OT, infrastructure and product/platform penetration testing.",icon:"pentest",status:"live",foot:"AWARE · 16 Agents · 2 Clients · 30% Optimization | OffSecOne · 10 Agents · 30% Optimization"},
+  {id:"ai-sec",name:"AI Security",desc:"AI app architecture review, AI code repo scan, LLM pentest and AI configuration review.",icon:"ai",status:"live",foot:"AEGIS & AITM · 1 Client · 7 Agents · ~40% Optimization"},
+  {id:"cas",name:"Cyber Attack Simulation",desc:"Breach attack simulation, red teaming, threat intelligence and threat hunting.",icon:"cas",status:"live",foot:"AIAE · 3 Agents · 40% Optimization"},
+  {id:"config",name:"Configuration Reviews",desc:"Cloud, OS, infrastructure and database configuration security reviews.",icon:"config",status:"live",foot:"Cloud Inspector · 7 Agents · ~30% Optimization"},
+  {id:"cloud",name:"Cloud Security",desc:"Cloud penetration testing and cloud native application security.",icon:"cloud",status:"live",foot:"OffSecOne · 4 Agents · 30% Optimization"}
+];
+
+const OFFERINGS = {
+  "secure-code":[
+    {id:"sast",name:"Code Security (SAST)",desc:"Static application security testing",status:"live"},
+    {id:"supply-chain",name:"Supply Chain Security",desc:"Dependency & supply chain risk",status:"progress"},
+    {id:"sca",name:"Software Composition Analysis (SCA)",desc:"Open-source component analysis",status:"live"},
+    {id:"sbom",name:"SBOM",desc:"Software bill of materials",status:"planned"}
+  ],
+  "secure-sdlc":[
+    {id:"devsecops",name:"DevSecOps",desc:"CI/CD security pipeline automation",status:"live"},
+    {id:"design-review",name:"Design Reviews",desc:"Secure design & architecture review",status:"live"}
+  ],
+  "ctem":[
+    {id:"vuln-scan",name:"Vulnerability Scanning",desc:"Automated vulnerability discovery",status:"live"},
+    {id:"remediation",name:"Remediation Factory",desc:"AI-driven remediation guidance",status:"planned"},
+    {id:"dast",name:"DAST",desc:"Dynamic application security testing",status:"live"},
+    {id:"asm",name:"Attack Surface Management",desc:"External attack surface discovery",status:"live"},
+    {id:"continuous",name:"Continuous Threat Exposure Management",desc:"Ongoing exposure monitoring",status:"planned"}
+  ],
+  "pentest":[
+    {id:"web-pt",name:"Web Application PT",desc:"OWASP Top 10 / SANS methodology",status:"live"},
+    {id:"api-pt",name:"API Pen Testing",desc:"REST/GraphQL/SOAP endpoint testing",status:"live"},
+    {id:"infra-pt",name:"Infrastructure PT",desc:"Network, servers, firewalls (OSSTMM)",status:"live"},
+    {id:"mobile-pt",name:"Mobile PT",desc:"Android/iOS OWASP Mobile Top 10",status:"live"},
+    {id:"thick-pt",name:"Thick Client PT",desc:"Desktop application testing",status:"live"},
+    {id:"llm-pt",name:"AI / LLM PT",desc:"OWASP LLM Top 10 red-teaming",status:"live"},
+    {id:"ot-pt",name:"OT Penetration Testing",desc:"Operational technology security testing",status:"progress"},
+    {id:"product-pt",name:"Product / Platform PT",desc:"SaaS/PaaS end-to-end product testing",status:"live"}
+  ],
+  "ai-sec":[
+    {id:"ai-arch",name:"AI App Architecture Review / Threat Modeling",desc:"AI system architecture & STRIDE / MITRE ATLAS analysis",status:"live"},
+    {id:"ai-code",name:"AI Code Repository Scan",desc:"AI/ML code security scanning",status:"live"},
+    {id:"ai-config",name:"AI Configuration Review",desc:"AI system configuration audit",status:"live"},
+    {id:"llm-red",name:"LLM Penetration Testing",desc:"OWASP LLM Top 10 adversarial probes",status:"live"}
+  ],
+  "cas":[
+    {id:"bas",name:"Breach Attack Simulation",desc:"Automated adversary emulation",status:"live"},
+    {id:"red-team",name:"Red Teaming",desc:"Full-scope adversary simulation",status:"live"},
+    {id:"threat-intel",name:"Threat Intelligence",desc:"OSINT-driven correlated intelligence",status:"progress"},
+    {id:"threat-hunt",name:"Threat Hunting",desc:"Proactive threat discovery",status:"progress"}
+  ],
+  "config":[
+    {id:"cloud-cfg",name:"Cloud Configuration Reviews",desc:"Cloud posture & misconfig detection",status:"live"},
+    {id:"os-cfg",name:"OS Configuration Reviews",desc:"Operating system hardening review",status:"planned"},
+    {id:"infra-cfg",name:"Infra Configuration Reviews",desc:"Infrastructure baseline review",status:"planned"},
+    {id:"db-cfg",name:"Database Configuration Reviews",desc:"Database hardening & security review",status:"planned"}
+  ],
+  "cloud":[
+    {id:"cloud-pt",name:"Cloud Penetration Testing",desc:"AWS/Azure/GCP penetration testing (CSA, NIST)",status:"live"},
+    {id:"cloud-native",name:"Cloud Native Apps",desc:"Container, K8s, serverless security",status:"planned"}
+  ]
+};
+
+const TOOLS = [
+  {
+    id:"aware", name:"AWARE", acro:"Automated Web App Recon & Exploitation",
+    source:"accenture", status:"deployed", url:"https://aware-framework.accenture.com/",
+    desc:"AI-powered unified SaaS security platform that seamlessly automates vulnerability detection via prompt engineering, correlation, and remediation across applications and code within a single ecosystem. Covers 6 major security services: SAST, DAST, SCA, PenTest, Cloud Config Review and Infra VM.",
+    services:["secure-code","pentest","ctem","cloud"],
+    offerings:["sast","sca","web-pt","api-pt","vuln-scan","dast","ai-code","cloud-pt"],
+    metrics:{Optimization:"30%",Agents:"10",Clients:"5",Coverage:"6 services"},
+    clients:["CIO","AEH","PayPal","RCM","Opella"],
+    subServices:["SAST","DAST","SCA","Web PenTest","Cloud Config Review","Infra VM","Auto Crawl","Endpoint Discovery","Vulnerability Management","AI Remediation Assistant"],
+    integrations:["Fortify","HCL AppScan","WebInspect","Burp Suite","Veracode","Black Duck","ScoutSuite"],
+    architecture:"6-layer agentic pipeline: Config → Scan Invocation → Execution → FPA → Reporting → Remediation",
+    agents:[
+      {n:"DAST Agent",d:"Perform Application Security Testing",o:"25%"},
+      {n:"SAST Agent",d:"Perform Source Code Review",o:"30%"},
+      {n:"SCA Agent",d:"Perform Software Composition Analysis",o:"30%"},
+      {n:"Auto Crawl Agent",d:"Crawl application URLs",o:"40%"},
+      {n:"Endpoint Discovery Agent",d:"Identify API Endpoints",o:"40%"},
+      {n:"Pentest Agent",d:"Perform Application Penetration Testing",o:"35%"},
+      {n:"Vuln Management Agent",d:"Perform Vulnerability Management",o:"20%"},
+      {n:"Cloud Config Review Agent",d:"Perform cloud configuration review",o:"20%"},
+      {n:"Reporting Agent",d:"Threat Intel Enriched Reporting",o:"40%"},
+      {n:"AI Remediation Assistant",d:"AI-Powered Remediation Guidance",o:"30%"}
+    ]
+  },
+  {
+    id:"adi", name:"ADI", acro:"Automated DevSecOps Integrator",
+    source:"accenture", status:"deployed",
+    desc:"ADI accelerates DevSecOps adoption through AI-driven pipeline automation, intelligent security scanning, automated false positive analysis, real-time vulnerability visibility, and AI-powered remediation assistance. LLM-based pipeline script generation for Azure DevOps, Jenkins and GitHub.",
+    services:["secure-sdlc"],
+    offerings:["devsecops"],
+    metrics:{Optimization:"60%",Agents:"8",Clients:"5","Scan types":"4"},
+    clients:["CBUAE","TFO","Magnum","MS Amlin","Whirlpool"],
+    subServices:["AI Pipeline Generation","SAST","DAST","SCA","Code Quality","Tool Setup Assistant","False Positive Analysis","AI Remediation Guidance","Compliance Reporting"],
+    integrations:["Azure DevOps","Jenkins","GitHub","Fortify","Veracode","Checkmarx","Semgrep","Aikido Sec"],
+    architecture:"6-layer agentic pipeline: Pipeline → Setup → Execution → FPA → Reporting → Remediation",
+    agents:[
+      {n:"Pipeline Creator Agent",d:"Builds and configures CI/CD pipelines",o:"70%"},
+      {n:"Tool Setup Assistant Agent",d:"Agent & tool installation guidance",o:"60%"},
+      {n:"SAST Runner Agent",d:"Static application security scanning",o:"40%"},
+      {n:"DAST Runner Agent",d:"Dynamic live app security scan",o:"40%"},
+      {n:"SAST Filter Agent",d:"Removes SAST false positives",o:"60%"},
+      {n:"DAST Filter Agent",d:"Removes DAST false positives",o:"60%"},
+      {n:"Remediation Guide Agent",d:"Guided step-by-step fix walkthrough",o:"60%"},
+      {n:"Report Agent",d:"Generates and delivers audit reports",o:"60%"}
+    ]
+  },
+  {
+    id:"aegis", name:"AEGIS", acro:"AI Endpoint Guardrail & Inspection System",
+    source:"accenture", status:"deployed", url:"http://3.6.103.74:8080/",
+    desc:"AEGIS is an AI-powered LLM security validation platform that runs 40+ probe families (~2,000 adversarial prompts) against any GenAI endpoint. One-click scan from target to Accenture-branded evidence pack. Powered by open-source garak (NVIDIA) engine — $0 engine license cost with ~40% effort reduction vs manual AI/LLM security.",
+    services:["ai-sec","pentest"],
+    offerings:["llm-red","llm-pt"],
+    metrics:{Optimization:"40%",Agents:"4","Probe families":"40+","Prompts/scan":"~2,000"},
+    clients:["CIO","AEH","CDP","APP","APP PS"],
+    subServices:["LLM Red-Teaming","Prompt Injection","Jailbreak Testing","Encoding Attacks","Data Leakage","Refusal Testing","Hallucination Tests","OWASP LLM Top 10"],
+    integrations:["garak (NVIDIA)","Ollama","OpenAI","Azure OpenAI","AWS Bedrock","Custom REST"],
+    architecture:"4-agent pipeline: Orchestrator → Probe Generator → Detector/Scorer → AI Analyst",
+    agents:[
+      {n:"Orchestrator Agent",d:"Scan lifecycle controller. Queues & runs jobs end-to-end.",o:"40%"},
+      {n:"Probe Generator Agent",d:"Fires 40+ OWASP probe families: injection, jailbreak, leakage",o:"40%"},
+      {n:"Detector / Scorer Agent",d:"60+ detectors score every response: string, semantic, refusal",o:"40%"},
+      {n:"AI Analyst Agent",d:"Writes severity, impact & remediation for each failed probe",o:"40%"}
+    ]
+  },
+  {
+    id:"aaria", name:"AARIA", acro:"Automated Architecture Review & Intelligent Attack Modelling",
+    source:"accenture", status:"deployed",
+    desc:"AI-powered architecture security review platform. Five-agent pipeline on AWS Bedrock automates threat modelling, compliance mapping (PCI-DSS, HIPAA, DORA, ISO 27001) and security assessments. Delivers DFD generation, evidence validation and STRIDE-based threat modelling.",
+    services:["secure-sdlc","ai-sec"],
+    offerings:["design-review","ai-arch"],
+    metrics:{Optimization:"40%",Agents:"5","Master Qs":"459",Stages:"4"},
+    clients:["AEH","CBUAE","Scout Motors","TFO","Celanese"],
+    subServices:["Architecture Review","STRIDE Threat Modelling","Compliance Mapping","Evidence Validation","DFD Generation","AI Architecture Analysis"],
+    integrations:["AWS Bedrock","Claude Sonnet 4.6","Checkmarx","Fortify","WebInspect","Semgrep"],
+    architecture:"5-agent pipeline: Orchestrator → Architecture Analyzer → Validation → Threat Modelling → Report Builder",
+    agents:[
+      {n:"Orchestrator Agent",d:"Pipeline entry, state initialisation",o:"40%"},
+      {n:"Architecture Analyzer Agent",d:"DFD Vision + Spec + Narrator",o:"55%"},
+      {n:"Validation Agent",d:"Evidence check + flag gaps",o:"50%"},
+      {n:"Report Builder Agent",d:"PDF + ReportLab + Waypoint",o:"60%"},
+      {n:"Threat Modelling Agent",d:"STRIDE + diagram + boundary mapping",o:"80%"}
+    ]
+  },
+  {
+    id:"aitm", name:"AITM", acro:"AI Integrated Threat Modelling",
+    source:"accenture", status:"deployed",
+    desc:"AI-powered threat modelling platform for LLM-based and agentic AI systems. Architecture-specific questionnaire (22+ base + 10+ AI-generated controls) cross-checks source code and maps findings to STRIDE, OWASP LLM Top 10, MITRE ATLAS and NIST AI RMF.",
+    services:["secure-sdlc","ai-sec"],
+    offerings:["design-review","ai-arch"],
+    metrics:{Optimization:"40%",Agents:"7",Layers:"5",Controls:"30+"},
+    clients:["CIO","AEH"],
+    subServices:["LLM Threat Modelling","STRIDE Analysis","OWASP LLM Top 10","MITRE ATLAS","NIST AI RMF Mapping","Human-in-the-Loop DFD Approval","AI Autofill from Source Code"],
+    integrations:["AWS Bedrock","Claude Sonnet 4.6","FastAPI","LangGraph","aiosqlite","PostgreSQL"],
+    architecture:"7-agent pipeline: Orchestrator → Ingestion → Question Builder → HITL Gate → Autofill → Validation → Report",
+    agents:[
+      {n:"Orchestrator",d:"Pipeline entry, state init",o:"25%"},
+      {n:"Ingestion Agent",d:"Architecture analysis & DFD",o:"30%"},
+      {n:"Question Builder Agent",d:"22+ base + 10+ AI questions",o:"30%"},
+      {n:"Human Gate (HITL)",d:"DFD approval checkpoint",o:"40%"},
+      {n:"Autofill Agent",d:"Code analysis & confidence scoring",o:"40%"},
+      {n:"Validation Agent",d:"Pass / Fail / Insufficient Evidence",o:"45%"},
+      {n:"Report Agent",d:"STRIDE / OWASP / MITRE map",o:"30%"}
+    ]
+  },
+  {
+    id:"offsecone", name:"OffSecOne", acro:"Integrated OffSec Managed Services Platform",
+    source:"accenture", status:"progress",
+    desc:"All-in-One Security Review Console. Unified delivery across all offensive service lines — one team, one platform, from scoping to reporting. Backed by 50+ full-stack security engineers (ETA Aug 2026), proprietary OffSec Platform (ETA Dec 2026), and tool evaluation across the full offensive security stack. Integrates with XBOW for autonomous testing.",
+    services:["pentest","cas","cloud"],
+    offerings:["infra-pt","mobile-pt","thick-pt","ot-pt","product-pt","bas","red-team","cloud-pt"],
+    metrics:{Optimization:"30%",Agents:"10","Engineers":"50+","Launch":"Oct 2026"},
+    clients:["Internal — Cyber Resilience Practice"],
+    subServices:["Web PT","API PT","Infra PT","Mobile PT","Thick Client PT","OT PT","Product PT","Cloud PT","BAS","Red Teaming"],
+    integrations:["XBOW","Burp Suite Pro","Metasploit","Cobalt Strike","Nmap","Shodan","Custom OffSec Platform"],
+    architecture:"Unified delivery platform · Scoping → Recon → Execution → Evidence → Reporting",
+    agents:[
+      {n:"Scoping Agent",d:"Engagement scope definition and planning",o:"—"},
+      {n:"Recon Agent",d:"Automated reconnaissance & surface mapping",o:"—"},
+      {n:"Infra PT Agent",d:"Network & infra penetration testing",o:"—"},
+      {n:"Mobile PT Agent",d:"Android/iOS security testing",o:"—"},
+      {n:"Thick Client PT Agent",d:"Desktop application testing",o:"—"},
+      {n:"Product PT Agent",d:"SaaS/PaaS end-to-end testing",o:"—"},
+      {n:"Cloud PT Agent",d:"AWS/Azure/GCP penetration testing",o:"—"},
+      {n:"BAS Agent",d:"Breach & attack simulation",o:"—"},
+      {n:"Red Team Agent",d:"Full-scope adversary simulation",o:"—"},
+      {n:"Report Agent",d:"Automated PT report generation",o:"—"}
+    ]
+  },
+  {
+    id:"aiae", name:"AIAE", acro:"Actionable Intelligence API Enablement",
+    source:"accenture", status:"progress",
+    desc:"OSINT-driven correlated intelligence platform for external attack surface management, threat intelligence enrichment and attack surface discovery. Feeds CTEM and Cyber Attack Simulation workflows with real-time exposure data.",
+    services:["ctem","cas"],
+    offerings:["asm","threat-intel"],
+    metrics:{Optimization:"40%",Agents:"3",Feeds:"OSINT","Coverage":"External ASM"},
+    clients:["Internal — Cyber Resilience Practice"],
+    subServices:["OSINT Aggregation","External ASM","Threat Intel Enrichment","IOC & TTP Correlation"],
+    integrations:["Shodan","Censys","VirusTotal","MISP","Custom OSINT Feeds"],
+    architecture:"3-agent pipeline: OSINT Collector → Correlator → Enrichment",
+    agents:[
+      {n:"OSINT Collector Agent",d:"Aggregates OSINT sources for attack surface data",o:"40%"},
+      {n:"Correlator Agent",d:"Correlates IOCs and TTPs across feeds",o:"40%"},
+      {n:"Enrichment Agent",d:"Contextualises intel with client-specific data",o:"40%"}
+    ]
+  },
+  {
+    id:"cloud-inspector", name:"Cloud Inspector", acro:"Cloud Configuration & Posture Review Platform",
+    source:"accenture", status:"progress",
+    desc:"Cloud-native configuration review platform covering AWS, Azure, GCP and custom cloud environments. Automated posture assessment against CIS benchmarks, misconfiguration detection and IAM analysis.",
+    services:["config"],
+    offerings:["cloud-cfg"],
+    metrics:{Optimization:"~30%",Agents:"7",Clouds:"AWS·Azure·GCP","Benchmarks":"CIS"},
+    clients:["Internal — Cyber Resilience Practice"],
+    subServices:["Cloud Config Review","CIS Benchmark Assessment","IAM Analysis","Public Exposure Check","Privilege Escalation Detection"],
+    integrations:["AWS Config","Azure Policy","GCP Security Command Center","ScoutSuite","Prowler"],
+    architecture:"7-agent modular pipeline for multi-cloud configuration assessment",
+    agents:[
+      {n:"AWS Config Agent",d:"AWS misconfiguration detection",o:"30%"},
+      {n:"Azure Config Agent",d:"Azure security posture review",o:"30%"},
+      {n:"GCP Config Agent",d:"GCP configuration assessment",o:"30%"},
+      {n:"IAM Analyzer",d:"IAM policy and role review",o:"30%"},
+      {n:"Exposure Agent",d:"Public exposure and public access detection",o:"30%"},
+      {n:"Compliance Agent",d:"CIS benchmark & compliance mapping",o:"30%"},
+      {n:"Report Agent",d:"Automated posture reporting",o:"30%"}
+    ]
+  },
+  {
+    id:"xbow", name:"XBOW", acro:"Autonomous Offensive Security Platform (Strategic Partner)",
+    source:"partner", status:"deployed", url:"https://xbow.com",
+    desc:"AI-powered autonomous penetration testing platform (Accenture Ventures investee, May 2026). Autonomous agents discover, chain and exploit real vulnerabilities at machine speed with deterministic validation. Near-zero false positives, SOC2/ISO 27001/PCI DSS/NIS 2 compliant reporting. Integrated with Microsoft Security Copilot and Sentinel. Strategic partnership announced with Accenture in Slide 15 of the Cyber Resilience Portfolio Overview.",
+    services:["pentest","ctem","cas"],
+    offerings:["web-pt","api-pt","asm","continuous","bas","vuln-scan"],
+    metrics:{Funding:"$270M","MSRC":"Top rank",Validation:"Deterministic",Compliance:"SOC2·ISO·PCI·NIS2"},
+    clients:["150+ security teams globally"],
+    subServices:["Autonomous Web App PT","Continuous PT","Attack Surface Discovery","Multi-step Exploit Chain","API Security Testing","Exposure Management"],
+    integrations:["Microsoft Security Copilot","Microsoft Sentinel","AWS ISV Accelerate","Accenture Cyber.AI"],
+    architecture:"Persistent Coordinator + Parallel Exploration Agents + Deterministic Validator + Shared Execution Environment",
+    agents:[
+      {n:"Persistent Coordinator",d:"Maintains global view of environment, directs testing, prioritises attack surface",o:"—"},
+      {n:"Autonomous Exploration Agents",d:"Thousands of parallel agents explore with human-like reasoning",o:"—"},
+      {n:"Deterministic Validator",d:"Confirms exploitability with non-destructive PoC challenges",o:"—"},
+      {n:"Shared Execution Environment",d:"Industry-standard tools + steerable headless browser",o:"—"}
+    ]
+  }
+];
+
+
+/* Icons */
+const ICONS = {
+  code:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+  sdlc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg>',
+  exposure:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  pentest:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
+  ai:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>',
+  cas:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  cloud:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>',
+  config:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>',
+  identity:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  intel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>'
+};
+
+/* ============================================================
+   STATE + ROUTER
+   ============================================================ */
+let currentStep = 1;
+let selectedServices = new Set();
+let selectedOfferings = new Set();
+let currentToolId = null;
+let filterSvc = new Set();
+let filterOff = new Set();
+
+function enterConsole(){
+  document.getElementById('page-login').style.display = 'none';
+  document.getElementById('app').classList.add('on');
+  goToStep(1);
+}
+
+function goToStep(step, toolId){
+  currentStep = step;
+  if(toolId) currentToolId = toolId;
+  if(step <= 2){ filterSvc.clear(); filterOff.clear(); }
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.querySelector('.sidebar')?.classList.remove('open');
+}
+
+function resetAll(){
+  selectedServices.clear();
+  selectedOfferings.clear();
+  filterSvc.clear();
+  filterOff.clear();
+  currentToolId = null;
+  goToStep(1);
+}
+
+/* ============================================================
+   RENDERERS
+   ============================================================ */
+function renderSidebar(){
+  const el = document.getElementById('sb-services');
+  el.innerHTML = SERVICES.map(s=>{
+    const cnt = TOOLS.filter(t=>t.services.includes(s.id)).length;
+    const isOn = selectedServices.has(s.id);
+    const isDev = s.status === 'dev';
+    return `<div class="sb-item ${isOn?'on':''} ${isDev?'dev':''}" onclick="${isDev?'':'toggleServiceFromSidebar(\''+s.id+'\')'}">
+      <span>${s.name}</span>
+      ${isDev?`<span class="dev-tag">SOON</span>`:`<span class="cnt">${cnt}</span>`}
+    </div>`;
+  }).join('');
+}
+
+function toggleServiceFromSidebar(id){
+  if(selectedServices.has(id)) selectedServices.delete(id);
+  else selectedServices.add(id);
+  selectedOfferings.clear();
+  filterSvc.clear();
+  filterOff.clear();
+  if(currentStep === 4) goToStep(3);
+  else render();
+}
+
+function renderBreadcrumb(){
+  const steps = [
+    {n:1,l:"Select Service"},
+    {n:2,l:"Select Offering"},
+    {n:3,l:"Matching Tools"},
+    {n:4,l:"Tool Details"}
+  ];
+  return `<div class="breadcrumb">
+    ${steps.map((s,i)=>{
+      const cls = currentStep===s.n ? 'active' : (currentStep>s.n ? 'done' : '');
+      const clickable = currentStep>s.n;
+      return `<span class="b-step ${cls}" ${clickable?`onclick="goToStep(${s.n})" style="cursor:pointer"`:''}>${s.l}</span>${i<steps.length-1?'<span class="b-arrow">›</span>':''}`;
+    }).join('')}
+  </div>`;
+}
+
+function renderSelStrip(){
+  if(currentStep === 1) return '';
+  const svcNames = [...selectedServices].map(id=>SERVICES.find(s=>s.id===id)?.name).filter(Boolean);
+  const offNames = [];
+  selectedServices.forEach(sid=>{
+    (OFFERINGS[sid]||[]).forEach(o=>{
+      if(selectedOfferings.has(o.id)) offNames.push(o.name);
+    });
+  });
+  return `<div class="sel-strip">
+    <span class="sl">Selected:</span>
+    ${svcNames.map(n=>`<span class="sc">${n}</span>`).join('')}
+    ${offNames.map(n=>`<span class="sc sc-off">${n}</span>`).join('')}
+    <span class="change" onclick="goToStep(1)">Change selection</span>
+  </div>`;
+}
+
+/* PAGE 1 — Service Selection */
+function renderStep1(){
+  const main = document.getElementById('main-content');
+  main.innerHTML = `
+    ${renderBreadcrumb()}
+    <div class="page-head" style="margin-top:18px">
+      <h1 class="page-title">Select a service</h1>
+      <p class="page-sub">Pick one or more Cyber Resilience services you want to explore. You can combine services for a unified engagement view.</p>
+    </div>
+    <div class="card-grid" id="svc-grid"></div>
+    <div class="step-footer">
+      <div></div>
+      <div class="step-footer-hint" id="hint">Select at least one service to continue</div>
+      <button class="step-next" id="next-btn" disabled onclick="goToStep(2)">
+        View Offerings
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  `;
+
+  const grid = document.getElementById('svc-grid');
+  grid.innerHTML = SERVICES.map(s=>{
+    const isOn = selectedServices.has(s.id);
+    const isDev = s.status === 'dev';
+    const toolCount = TOOLS.filter(t=>t.services.includes(s.id)).length;
+    const offCount = (OFFERINGS[s.id]||[]).length;
+    return `<div class="sel-card ${isOn?'on':''} ${isDev?'dev':''}" data-id="${s.id}">
+      ${isDev?`<span class="dev-badge">Coming Soon</span>`:''}
+      <div class="sel-card-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="sel-card-icon">${ICONS[s.icon]||''}</div>
+      <div class="sel-card-name">${s.name}</div>
+      <div class="sel-card-desc">${s.desc}</div>
+      ${s.foot ? `<div style="font-size:10.5px;color:var(--brand-2);background:var(--brand-bg);padding:6px 10px;border-radius:6px;font-weight:600;line-height:1.4;margin-top:2px">${s.foot}</div>`:''}
+      <div class="sel-card-meta">
+        ${isDev?`<span class="m" style="color:var(--amber);font-weight:700">Under Development</span>`:`
+        <span class="m"><b>${offCount}</b> offerings</span>
+        <span class="m"><b>${toolCount}</b> tools</span>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  [...grid.querySelectorAll('.sel-card:not(.dev)')].forEach(card=>{
+    card.addEventListener('click',()=>{
+      const id = card.dataset.id;
+      if(selectedServices.has(id)) selectedServices.delete(id);
+      else selectedServices.add(id);
+      selectedOfferings.clear();
+      renderStep1();
+      renderSidebar();
+    });
+  });
+
+  const btn = document.getElementById('next-btn');
+  const hint = document.getElementById('hint');
+  if(selectedServices.size > 0){
+    btn.disabled = false;
+    hint.textContent = `${selectedServices.size} service${selectedServices.size>1?'s':''} selected`;
+  }
+}
+
+/* PAGE 2 — Offering Selection */
+function renderStep2(){
+  const main = document.getElementById('main-content');
+  const svcNames = [...selectedServices].map(id=>SERVICES.find(s=>s.id===id)?.name).filter(Boolean).join(', ');
+
+  main.innerHTML = `
+    ${renderBreadcrumb()}
+    ${renderSelStrip()}
+    <div class="page-head">
+      <h1 class="page-title">Select an offering</h1>
+      <p class="page-sub">Choose the specific offerings within <b>${svcNames}</b> that match your engagement scope. Multi-select is supported. Leave all unselected to see every tool that covers your services.</p>
+    </div>
+    <div id="off-groups"></div>
+    <div class="step-footer">
+      <button class="step-back" onclick="goToStep(1)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back
+      </button>
+      <div class="step-footer-hint" id="hint">Optional — ${selectedOfferings.size} offering${selectedOfferings.size===1?'':'s'} selected</div>
+      <button class="step-next" onclick="goToStep(3)">
+        View Matching Tools
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  `;
+
+  const groupsEl = document.getElementById('off-groups');
+  const html = [...selectedServices].map(sid=>{
+    const svc = SERVICES.find(s=>s.id===sid);
+    const offs = OFFERINGS[sid] || [];
+    if(offs.length === 0) return `<div style="margin-bottom:22px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">${svc.name}</div>
+      <div class="empty" style="padding:30px"><div class="t">Offering mapping in progress</div><div class="s">Our team is actively building this out — check back soon.</div></div>
+    </div>`;
+    return `<div style="margin-bottom:22px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">${svc.name}</div>
+      <div class="card-grid">
+        ${offs.map(o=>{
+          const isOn = selectedOfferings.has(o.id);
+          const isPlanned = o.status === 'planned';
+          const isProgress = o.status === 'progress';
+          const statusBadge = isPlanned
+            ? `<span style="position:absolute;top:12px;left:12px;font-size:9px;font-weight:700;background:var(--amber-bg);color:var(--amber);padding:3px 8px;border-radius:999px;letter-spacing:.04em">To Be Initiated</span>`
+            : isProgress
+              ? `<span style="position:absolute;top:12px;left:12px;font-size:9px;font-weight:700;background:#fff7ed;color:#c2410c;padding:3px 8px;border-radius:999px;letter-spacing:.04em">In Progress</span>`
+              : '';
+          const dimStyle = isPlanned ? 'opacity:.7' : '';
+          return `<div class="sel-card ${isOn?'on':''}" data-off="${o.id}" style="min-height:120px;padding-top:${(isPlanned||isProgress)?'34px':'20px'};${dimStyle}">
+            ${statusBadge}
+            <div class="sel-card-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="sel-card-name" style="font-size:14px;padding-right:32px">${o.name}</div>
+            <div class="sel-card-desc" style="font-size:12px">${o.desc}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  groupsEl.innerHTML = html;
+
+  [...groupsEl.querySelectorAll('.sel-card')].forEach(card=>{
+    card.addEventListener('click',()=>{
+      const id = card.dataset.off;
+      if(selectedOfferings.has(id)) selectedOfferings.delete(id);
+      else selectedOfferings.add(id);
+      renderStep2();
+    });
+  });
+}
+
+/* PAGE 3 — Matching Tools */
+function renderStep3(){
+  const main = document.getElementById('main-content');
+
+  /* Collect all selected service names + offering names for filters */
+  const selSvcList = [...selectedServices].map(id=>SERVICES.find(s=>s.id===id)).filter(Boolean);
+  const selOffList = [];
+  selectedServices.forEach(sid=>{
+    (OFFERINGS[sid]||[]).forEach(o=>{
+      if(selectedOfferings.size===0 || selectedOfferings.has(o.id)){
+        if(!selOffList.find(x=>x.id===o.id)) selOffList.push(o);
+      }
+    });
+  });
+
+  /* Filter tools */
+  const list = TOOLS.filter(t=>{
+    /* Must cover at least one selected service */
+    if(!t.services.some(s=>selectedServices.has(s))) return false;
+    /* If offerings selected from step 2, must cover at least one */
+    if(selectedOfferings.size > 0){
+      if(!t.offerings.some(o=>selectedOfferings.has(o))) return false;
+    }
+    /* Page 3 sub-filter: by service */
+    if(filterSvc.size > 0){
+      if(!t.services.some(s=>filterSvc.has(s))) return false;
+    }
+    /* Page 3 sub-filter: by offering */
+    if(filterOff.size > 0){
+      if(!t.offerings.some(o=>filterOff.has(o))) return false;
+    }
+    return true;
+  });
+
+  const hasFilters = filterSvc.size > 0 || filterOff.size > 0;
+
+  main.innerHTML = `
+    ${renderBreadcrumb()}
+    ${renderSelStrip()}
+    <div class="page-head">
+      <h1 class="page-title">Matching tools <span style="font-size:18px;color:var(--muted);font-weight:600">(${list.length})</span></h1>
+      <p class="page-sub">Tools below match your selected services${selectedOfferings.size>0?' and offerings':''}. Use filters to narrow further. Click any tool for full details.</p>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="tool-filter-bar">
+      <div class="tool-filter-row">
+        <div class="tf-lbl">
+          Filter by Service
+          ${filterSvc.size > 0 ? `<span class="tf-clear" id="clear-svc-filter">Clear</span>`:''}
+        </div>
+        <div class="tf-pills" id="svc-filter-pills">
+          ${selSvcList.map(s=>{
+            const isOn = filterSvc.has(s.id);
+            const cnt = TOOLS.filter(t=>t.services.includes(s.id) && t.services.some(sv=>selectedServices.has(sv))).length;
+            return `<button class="tf-pill ${isOn?'svc-on':''}" data-svc="${s.id}">${s.name} <span class="cnt">${cnt}</span></button>`;
+          }).join('')}
+        </div>
+      </div>
+      ${selOffList.length > 0 ? `
+      <div class="tool-filter-row">
+        <div class="tf-lbl">
+          Filter by Offering
+          ${filterOff.size > 0 ? `<span class="tf-clear" id="clear-off-filter">Clear</span>`:''}
+        </div>
+        <div class="tf-pills" id="off-filter-pills">
+          ${selOffList.map(o=>{
+            const isOn = filterOff.has(o.id);
+            const cnt = TOOLS.filter(t=>t.offerings.includes(o.id)).length;
+            return `<button class="tf-pill ${isOn?'off-on':''}" data-off="${o.id}">${o.name} <span class="cnt">${cnt}</span></button>`;
+          }).join('')}
+        </div>
+      </div>`:''
+      }
+    </div>
+
+    <div id="tool-list"></div>
+    <div class="step-footer">
+      <button class="step-back" onclick="goToStep(2)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Offerings
+      </button>
+      <div style="flex:1"></div>
+      <button class="step-back" onclick="resetAll()">Start over</button>
+    </div>
+  `;
+
+  /* Wire filter clicks */
+  document.querySelectorAll('#svc-filter-pills .tf-pill').forEach(p=>{
+    p.addEventListener('click',()=>{
+      const id = p.dataset.svc;
+      if(filterSvc.has(id)) filterSvc.delete(id); else filterSvc.add(id);
+      renderStep3();
+    });
+  });
+  document.querySelectorAll('#off-filter-pills .tf-pill').forEach(p=>{
+    p.addEventListener('click',()=>{
+      const id = p.dataset.off;
+      if(filterOff.has(id)) filterOff.delete(id); else filterOff.add(id);
+      renderStep3();
+    });
+  });
+  document.getElementById('clear-svc-filter')?.addEventListener('click',()=>{filterSvc.clear();renderStep3();});
+  document.getElementById('clear-off-filter')?.addEventListener('click',()=>{filterOff.clear();renderStep3();});
+
+  /* Render tool cards */
+  const listEl = document.getElementById('tool-list');
+  if(list.length === 0){
+    listEl.innerHTML = `<div class="empty">
+      <div class="ic">🔎</div>
+      <div class="t">We are working on this</div>
+      <div class="s">Tool mapping for this combination is in progress. Try selecting a different service or offering, or remove some filters above.</div>
+    </div>`;
+    return;
+  }
+
+  listEl.innerHTML = `<div class="tool-grid">${list.map(t=>{
+    /* Services this tool covers that the user selected */
+    const coveredSvcs = t.services
+      .filter(s=>selectedServices.has(s))
+      .map(s=>SERVICES.find(x=>x.id===s)).filter(Boolean);
+
+    /* Offerings this tool covers that are relevant */
+    const relevantOffIds = new Set();
+    selectedServices.forEach(sid=>{
+      (OFFERINGS[sid]||[]).forEach(o=>{
+        if(selectedOfferings.size===0 || selectedOfferings.has(o.id)){
+          if(t.offerings.includes(o.id)) relevantOffIds.add(o.id);
+        }
+      });
+    });
+    const coveredOffs = [...relevantOffIds].map(oid=>{
+      let found = null;
+      Object.values(OFFERINGS).forEach(arr=>{
+        const m = arr.find(o=>o.id===oid);
+        if(m) found = m;
+      });
+      return found;
+    }).filter(Boolean);
+
+    const sourceLbl = {accenture:'ACCENTURE',partner:'PARTNER',global:'GLOBAL TEAM'}[t.source];
+
+    return `<div class="tool-card" onclick="goToStep(4,'${t.id}')">
+      <div class="tool-card-head">
+        <div>
+          <h3 class="tool-card-name">${t.name}</h3>
+          <span class="tool-card-acro">${t.acro}</span>
+        </div>
+        <span class="tool-source ${t.source}">${sourceLbl}</span>
+      </div>
+      <div class="tool-card-desc">${t.desc.slice(0,160)}${t.desc.length>160?'…':''}</div>
+      <div class="tool-card-supports">
+        <div class="lbl">Services Covered (${coveredSvcs.length})</div>
+        ${coveredSvcs.map(s=>`<div class="item">${s.name}</div>`).join('')}
+      </div>
+      ${coveredOffs.length > 0 ? `
+      <div class="tool-card-supports" style="background:var(--teal-bg);margin-top:0">
+        <div class="lbl" style="color:var(--teal)">Offerings Covered (${coveredOffs.length})</div>
+        ${coveredOffs.map(o=>`<div class="item" style="--green:var(--teal)">${o.name}</div>`).join('')}
+      </div>`:''}
+      <div class="tool-card-meta">
+        <span class="m"><b>${t.agents.length}</b> agents</span>
+        <span class="m"><b>${t.subServices.length}</b> sub-services</span>
+        <span class="m"><b>${t.integrations.length}</b> integrations</span>
+      </div>
+      <button class="tool-card-cta">
+        View Details
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* PAGE 4 — Tool Detail */
+function renderStep4(){
+  const main = document.getElementById('main-content');
+  const t = TOOLS.find(x=>x.id===currentToolId);
+  if(!t){ goToStep(3); return; }
+
+  const sourceLbl = {accenture:'ACCENTURE ASSET',partner:'STRATEGIC PARTNER',global:'GLOBAL TEAM'}[t.source];
+  const allSvcNames = t.services.map(s=>SERVICES.find(x=>x.id===s)?.name).filter(Boolean);
+  const allOfferingNames = [];
+  t.services.forEach(sid=>{
+    (OFFERINGS[sid]||[]).forEach(o=>{
+      if(t.offerings.includes(o.id)) allOfferingNames.push(o.name);
+    });
+  });
+  const uniqOfferings = [...new Set(allOfferingNames)];
+
+  const launchBtn = t.url
+    ? `<a class="dt-btn primary" href="${t.url}" target="_blank" rel="noopener noreferrer">
+        Launch Tool
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7M7 7h10v10"/></svg>
+      </a>`
+    : `<span class="dt-btn primary" style="opacity:.6;cursor:not-allowed">Launch URL not yet available</span>`;
+
+  main.innerHTML = `
+    ${renderBreadcrumb()}
+    ${renderSelStrip()}
+
+    <div class="detail-hero">
+      <div class="badge-row">
+        <span class="b">${sourceLbl}</span>
+        <span class="b dep">● Deployed</span>
+      </div>
+      <h1 class="dt-name">${t.name}</h1>
+      <div class="dt-acro">${t.acro}</div>
+      <p class="dt-desc">${t.desc}</p>
+      <div class="dt-actions">
+        ${launchBtn}
+        <button class="dt-btn ghost" onclick="goToStep(3)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to tools
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-panel">
+        <h3>Key Metrics</h3>
+        <div class="dp-metrics">
+          ${Object.entries(t.metrics).map(([k,v])=>`
+            <div class="dp-metric"><div class="v">${v}</div><div class="l">${k}</div></div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="detail-panel">
+        <div class="lbl">Owner</div>
+        <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:14px">Accenture Cyber Resilience Practice</div>
+        ${t.clients && t.clients.length ? `
+          <div class="lbl">Clients / Deployments</div>
+          <div class="dp-pills" style="margin-bottom:14px">
+            ${t.clients.map(c=>`<span class="dp-pill">${c}</span>`).join('')}
+          </div>
+        `:''}
+        ${t.architecture ? `
+          <div class="lbl">Architecture</div>
+          <div style="font-size:12.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">${t.architecture}</div>
+        `:''}
+        <div class="lbl">Documentation</div>
+        <div style="font-size:12.5px;color:var(--muted)">Available on internal portal · Contact Cyber Resilience team for access</div>
+      </div>
+    </div>
+
+    <div class="detail-panel" style="margin-bottom:16px">
+      <div class="lbl">Supported Services</div>
+      <div class="dp-pills" style="margin-bottom:16px">
+        ${allSvcNames.map(n=>`<span class="dp-pill brand">${n}</span>`).join('')}
+      </div>
+      <div class="lbl">Supported Offerings</div>
+      <div class="dp-pills">
+        ${uniqOfferings.map(n=>`<span class="dp-pill">${n}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="detail-panel" style="margin-bottom:16px">
+      <h3>Sub-services (${t.subServices.length})</h3>
+      <div class="dp-pills">
+        ${t.subServices.map(s=>`<span class="dp-pill">${s}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="detail-panel" style="margin-bottom:16px">
+      <h3>Integrations (${t.integrations.length})</h3>
+      <div class="dp-pills">
+        ${t.integrations.map(i=>`<span class="dp-pill">${i}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="detail-panel">
+      <h3>Agents (${t.agents.length})</h3>
+      <div class="agents-list">
+        ${t.agents.map(a=>`
+          <div class="agent">
+            <div>
+              <div class="a-name">${a.n}</div>
+              <div class="a-desc">${a.d}</div>
+            </div>
+            ${a.o && a.o!=='—'?`<div class="a-opt">${a.o}</div>`:''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/* Master render */
+function render(){
+  renderSidebar();
+  if(currentStep === 1) renderStep1();
+  else if(currentStep === 2) renderStep2();
+  else if(currentStep === 3) renderStep3();
+  else if(currentStep === 4) renderStep4();
+}
+
+/* Init */
+renderSidebar();
+</script>
+</body>
+</html>
