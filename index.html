@@ -60,24 +60,42 @@
   #app{display:none;min-height:100vh}
   #app.on{display:grid;grid-template-columns:260px 1fr}
   @media(max-width:900px){#app.on{grid-template-columns:1fr}}
+  .app-topbar{display:none}
+  @media(max-width:900px){
+    .app-topbar{display:flex;align-items:center;justify-content:space-between;background:#0f0322;color:#fff;padding:12px 20px;position:sticky;top:0;z-index:20}
+    .app-topbar .tb-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;cursor:pointer}
+  }
 
   /* ========= SIDEBAR ========= */
-  .sidebar{background:#0f0322;color:#fff;padding:24px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
-  @media(max-width:900px){.sidebar{position:relative;height:auto;padding:16px 0}}
-  .sb-brand{padding:0 24px 24px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:20px;display:flex;align-items:center;gap:10px;cursor:pointer}
-  .sb-brand .gt{color:#a100ff;font-size:26px;font-weight:800;line-height:1}
-  .sb-brand-txt{font-size:14px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
-  .sb-brand-sub{font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
-  .sb-section{padding:0 12px;margin-bottom:20px}
-  .sb-section-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);padding:0 12px;margin-bottom:8px}
-  .sb-item{padding:10px 14px;border-radius:8px;font-size:13.5px;font-weight:500;color:rgba(255,255,255,.75);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:all .15s;margin-bottom:2px}
+  .sidebar{background:#0f0322;color:#fff;padding:0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  @media(max-width:900px){.sidebar{position:relative;height:auto}}
+  .sb-brand{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}
+  .sb-brand:hover{background:rgba(255,255,255,.03)}
+  .sb-brand .gt-box{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#7400b8,#a100ff);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;box-shadow:0 4px 14px rgba(161,0,255,.40);flex-shrink:0;letter-spacing:-.02em}
+  .sb-brand-txt{font-size:16px;font-weight:800;letter-spacing:-.015em;line-height:1.15}
+  .sb-brand-sub{font-size:10px;color:#a100ff;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+
+  /* Step tracker in sidebar */
+  .sb-steps{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:0}
+  .sb-step{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;position:relative}
+  .sb-step .dot{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.20);background:transparent;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(255,255,255,.35);transition:all .15s}
+  .sb-step.done .dot{background:#a100ff;border-color:#a100ff;color:#fff}
+  .sb-step.active .dot{background:linear-gradient(135deg,#a100ff,#7400b8);border-color:#a100ff;color:#fff;box-shadow:0 0 10px rgba(161,0,255,.50)}
+  .sb-step .lbl{font-size:7.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.30);text-align:center;white-space:nowrap}
+  .sb-step.done .lbl,.sb-step.active .lbl{color:rgba(255,255,255,.75)}
+  .sb-step-line{flex:0 0 auto;width:20px;height:2px;background:rgba(255,255,255,.10);margin-top:-10px}
+  .sb-step-line.done{background:#a100ff}
+
+  .sb-section{padding:0 10px;margin-bottom:10px;margin-top:12px}
+  .sb-section-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:0 8px;margin-bottom:6px}
+  .sb-item{padding:8px 12px;border-radius:8px;font-size:13px;font-weight:500;color:rgba(255,255,255,.70);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:all .12s;margin-bottom:1px}
   .sb-item:hover{background:rgba(255,255,255,.06);color:#fff}
   .sb-item.on{background:linear-gradient(135deg,#7400b8,#a100ff);color:#fff;font-weight:600}
   .sb-item .cnt{font-size:11px;background:rgba(255,255,255,.15);padding:2px 8px;border-radius:999px;font-weight:600}
   .sb-item.on .cnt{background:rgba(255,255,255,.25)}
   .sb-item.dev{opacity:.55}
   .sb-item .dev-tag{font-size:9px;background:var(--amber);color:#fff;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:.04em}
-  .sb-nav{padding:0 24px;margin-top:auto;font-size:11.5px;color:rgba(255,255,255,.45);border-top:1px solid rgba(255,255,255,.08);padding-top:20px;margin-top:20px}
+  .sb-nav{padding:12px 20px;font-size:11px;color:rgba(255,255,255,.40);border-top:1px solid rgba(255,255,255,.06);margin-top:auto}
   .sb-nav a{display:block;padding:6px 0;color:rgba(255,255,255,.55);cursor:pointer}
   .sb-nav a:hover{color:#fff}
 
@@ -86,42 +104,42 @@
   @media(max-width:900px){.main{padding:20px 20px 40px}}
 
   /* Breadcrumb + selected badge strip */
-  .breadcrumb{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:6px;flex-wrap:wrap}
-  .breadcrumb .b-step{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:500}
+  .breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap}
+  .breadcrumb .b-step{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:600;font-size:13px}
   .breadcrumb .b-step.done{background:var(--brand-bg);border-color:var(--brand-3);color:var(--brand-2)}
   .breadcrumb .b-step.done::before{content:"✓";font-weight:700}
-  .breadcrumb .b-step.active{background:linear-gradient(135deg,#7400b8,#a100ff);border-color:transparent;color:#fff;font-weight:600}
-  .breadcrumb .b-arrow{color:var(--muted-2);font-size:11px}
+  .breadcrumb .b-step.active{background:linear-gradient(135deg,#7400b8,#a100ff);border-color:transparent;color:#fff;font-weight:700;padding:7px 18px;font-size:13.5px}
+  .breadcrumb .b-arrow{color:var(--brand);font-size:16px;font-weight:800;cursor:default;padding:0}
 
-  .sel-strip{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:18px 0 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .sel-strip .sl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .sel-strip .sc{font-size:12px;font-weight:600;padding:4px 10px;background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2);border-radius:999px;display:inline-flex;align-items:center;gap:6px}
+  .sel-strip{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:18px 0 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .sel-strip .sl{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .sel-strip .sc{font-size:14px;font-weight:600;padding:7px 14px;background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2);border-radius:999px;display:inline-flex;align-items:center;gap:6px}
   .sel-strip .sc-off{background:var(--teal-bg);color:var(--teal)}
-  .sel-strip .change{margin-left:auto;font-size:12px;font-weight:600;color:var(--brand-2);cursor:pointer;padding:4px 12px;border-radius:6px}
+  .sel-strip .change{margin-left:auto;font-size:13px;font-weight:600;color:var(--brand-2);cursor:pointer;padding:6px 14px;border-radius:6px}
   .sel-strip .change:hover{background:var(--brand-bg)}
 
-  .page-head{margin-bottom:26px}
-  .page-title{font-size:30px;font-weight:800;letter-spacing:-.025em;margin:0 0 8px;color:var(--ink)}
+  .page-head{margin-bottom:16px}
+  .page-title{font-size:22px;font-weight:800;letter-spacing:-.025em;margin:0 0 6px;color:var(--ink)}
   .page-sub{font-size:14.5px;color:var(--muted);line-height:1.55;max-width:640px}
 
   /* ========= SERVICE / OFFERING CARDS ========= */
-  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:28px}
-  .sel-card{background:#fff;border:2px solid var(--line);border-radius:12px;padding:20px;cursor:pointer;transition:all .18s;position:relative;display:flex;flex-direction:column;gap:8px;min-height:150px}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px}
+  .sel-card{background:#fff;border:2px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;transition:all .18s;position:relative;display:flex;flex-direction:column;gap:5px;min-height:auto}
   .sel-card:hover{border-color:var(--brand-3);transform:translateY(-2px);box-shadow:var(--shadow)}
   .sel-card.on{border-color:var(--brand);background:linear-gradient(180deg,#fdfaff 0%,#fff 100%);box-shadow:0 0 0 3px rgba(161,0,255,.10)}
   .sel-card.dev{opacity:.65;cursor:not-allowed}
   .sel-card.dev:hover{transform:none;box-shadow:none;border-color:var(--line)}
-  .sel-card-check{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:6px;border:2px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s}
+  .sel-card-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:5px;border:2px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s}
   .sel-card.on .sel-card-check{background:linear-gradient(135deg,#7400b8,#a100ff);border-color:transparent;color:#fff}
-  .sel-card-check svg{width:12px;height:12px;opacity:0}
+  .sel-card-check svg{width:10px;height:10px;opacity:0}
   .sel-card.on .sel-card-check svg{opacity:1}
-  .sel-card-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2);display:flex;align-items:center;justify-content:center;margin-bottom:2px}
-  .sel-card-icon svg{width:20px;height:20px}
-  .sel-card-name{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em;line-height:1.25;padding-right:32px}
-  .sel-card-desc{font-size:12.5px;color:var(--muted);line-height:1.45;flex:1}
-  .sel-card-meta{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:600;color:var(--muted);margin-top:6px}
+  .sel-card-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2);display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+  .sel-card-icon svg{width:16px;height:16px}
+  .sel-card-name{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-.01em;line-height:1.25;padding-right:24px}
+  .sel-card-desc{font-size:11.5px;color:var(--muted);line-height:1.4;flex:1}
+  .sel-card-meta{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:600;color:var(--muted);margin-top:4px}
   .sel-card-meta .m{display:inline-flex;align-items:center;gap:4px}
-  .sel-card .dev-badge{position:absolute;top:14px;left:14px;font-size:9px;font-weight:700;background:var(--amber-bg);color:var(--amber);padding:3px 8px;border-radius:999px;letter-spacing:.04em}
+  .sel-card .dev-badge{position:absolute;top:10px;left:10px;font-size:9px;font-weight:700;background:var(--amber-bg);color:var(--amber);padding:2px 6px;border-radius:999px;letter-spacing:.04em}
 
   /* ========= CTA / STEP FOOTER ========= */
   .step-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px;flex-wrap:wrap}
@@ -174,6 +192,28 @@
   .tf-pill .cnt{font-size:10px;opacity:.75}
   .tf-clear{font-size:11px;color:var(--brand-2);cursor:pointer;font-weight:600;margin-left:8px;padding:2px 8px;border-radius:4px}
   .tf-clear:hover{background:var(--brand-bg)}
+
+  /* Cyber.AI advisory panel */
+  .cyberai-panel{background:linear-gradient(135deg,#0a0018 0%,#1a0033 50%,#3d0066 100%);border-radius:14px;padding:24px;margin-top:24px;color:#fff;position:relative;overflow:hidden}
+  .cyberai-panel::before{content:"";position:absolute;right:-80px;top:-80px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(161,0,255,.20),transparent 70%);pointer-events:none}
+  .cyberai-panel .cp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .cyberai-panel .cp-title{font-size:18px;font-weight:800;letter-spacing:-.01em}
+  .cyberai-panel .cp-tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+  .cyberai-panel .cp-desc{font-size:12.5px;line-height:1.55;color:rgba(255,255,255,.75);max-width:600px;margin-bottom:16px}
+  .cyberai-panel .cp-stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+  .cyberai-panel .cp-stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 12px;min-width:80px}
+  .cyberai-panel .cp-stat .v{font-size:18px;font-weight:800;color:#fff}
+  .cyberai-panel .cp-stat .l{font-size:10px;color:rgba(255,255,255,.60);margin-top:1px}
+  .cyberai-missions{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+  .cyberai-mission{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:10px;padding:14px;transition:all .15s}
+  .cyberai-mission:hover{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.18)}
+  .cyberai-mission .cm-name{font-size:13px;font-weight:700;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .cyberai-mission .cm-name::before{content:"⚡";font-size:12px}
+  .cyberai-mission .cm-agents{display:flex;flex-wrap:wrap;gap:4px}
+  .cyberai-mission .cm-agent{font-size:10px;padding:3px 8px;background:rgba(255,255,255,.10);border-radius:5px;color:rgba(255,255,255,.80);font-weight:500}
+  .cyberai-outcomes{margin-top:14px;display:flex;flex-direction:column;gap:4px}
+  .cyberai-outcomes .co{font-size:11.5px;color:rgba(255,255,255,.70);display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+  .cyberai-outcomes .co::before{content:"✓";color:#a7f3d0;font-weight:700;flex-shrink:0}
 
   /* ========= TOOL DETAIL (PAGE 4) ========= */
   .detail-hero{background:linear-gradient(135deg,#1a0033 0%,#3d0066 50%,#7400b8 100%);color:#fff;border-radius:16px;padding:30px 34px;margin-bottom:24px;position:relative;overflow:hidden}
@@ -267,20 +307,29 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-brand" onclick="goToStep(1)">
-      <span class="gt">&gt;</span>
+      <div class="gt-box">&gt;</div>
       <div>
         <div class="sb-brand-txt">Cyber Resilience</div>
         <div class="sb-brand-sub">Unified Console</div>
       </div>
     </div>
 
+    <!-- Step tracker -->
+    <div class="sb-steps" id="sb-steps"></div>
+
     <div class="sb-section">
       <div class="sb-section-lbl">Services</div>
       <div id="sb-services"></div>
     </div>
 
+    <div class="sb-section" style="padding:0 6px;margin-top:6px">
+      <div class="sb-section-lbl" style="padding:0 8px">Global Partnership</div>
+      <div id="sb-cyberai-item"></div>
+    </div>
+
     <div class="sb-nav">
-      <a onclick="goToStep(1)">↺ Reset selections</a>
+      <a onclick="goToStep(1)" style="display:block;color:rgba(255,255,255,.60);padding:5px 0;cursor:pointer">⌂ Home</a>
+      <a onclick="resetAll()" style="display:block;color:rgba(255,255,255,.35);padding:5px 0;cursor:pointer">↺ Reset all</a>
     </div>
   </aside>
 
@@ -308,7 +357,7 @@ const OFFERINGS = {
     {id:"sast",name:"Code Security (SAST)",desc:"Static application security testing",status:"live"},
     {id:"supply-chain",name:"Supply Chain Security",desc:"Dependency & supply chain risk",status:"progress"},
     {id:"sca",name:"Software Composition Analysis (SCA)",desc:"Open-source component analysis",status:"live"},
-    {id:"sbom",name:"SBOM",desc:"Software bill of materials",status:"planned"}
+    {id:"sbom",name:"SBOM",desc:"Software bill of materials",status:"progress"}
   ],
   "secure-sdlc":[
     {id:"devsecops",name:"DevSecOps",desc:"CI/CD security pipeline automation",status:"live"},
@@ -316,10 +365,10 @@ const OFFERINGS = {
   ],
   "ctem":[
     {id:"vuln-scan",name:"Vulnerability Scanning",desc:"Automated vulnerability discovery",status:"live"},
-    {id:"remediation",name:"Remediation Factory",desc:"AI-driven remediation guidance",status:"planned"},
+    {id:"remediation",name:"Remediation Factory",desc:"AI-driven remediation guidance",status:"progress"},
     {id:"dast",name:"DAST",desc:"Dynamic application security testing",status:"live"},
     {id:"asm",name:"Attack Surface Management",desc:"External attack surface discovery",status:"live"},
-    {id:"continuous",name:"Continuous Threat Exposure Management",desc:"Ongoing exposure monitoring",status:"planned"}
+    {id:"continuous",name:"Continuous Threat Exposure Management",desc:"Ongoing exposure monitoring",status:"progress"}
   ],
   "pentest":[
     {id:"web-pt",name:"Web Application PT",desc:"OWASP Top 10 / SANS methodology",status:"live"},
@@ -345,19 +394,19 @@ const OFFERINGS = {
   ],
   "config":[
     {id:"cloud-cfg",name:"Cloud Configuration Reviews",desc:"Cloud posture & misconfig detection",status:"live"},
-    {id:"os-cfg",name:"OS Configuration Reviews",desc:"Operating system hardening review",status:"planned"},
-    {id:"infra-cfg",name:"Infra Configuration Reviews",desc:"Infrastructure baseline review",status:"planned"},
-    {id:"db-cfg",name:"Database Configuration Reviews",desc:"Database hardening & security review",status:"planned"}
+    {id:"os-cfg",name:"OS Configuration Reviews",desc:"Operating system hardening review",status:"progress"},
+    {id:"infra-cfg",name:"Infra Configuration Reviews",desc:"Infrastructure baseline review",status:"progress"},
+    {id:"db-cfg",name:"Database Configuration Reviews",desc:"Database hardening & security review",status:"progress"}
   ],
   "cloud":[
     {id:"cloud-pt",name:"Cloud Penetration Testing",desc:"AWS/Azure/GCP penetration testing (CSA, NIST)",status:"live"},
-    {id:"cloud-native",name:"Cloud Native Apps",desc:"Container, K8s, serverless security",status:"planned"}
+    {id:"cloud-native",name:"Cloud Native Apps",desc:"Container, K8s, serverless security",status:"progress"}
   ]
 };
 
 const TOOLS = [
   {
-    id:"aware", name:"AWARE", acro:"Automated Web App Recon & Exploitation",
+    id:"aware", order:1, name:"AWARE", acro:"Automated Web App Recon & Exploitation",
     source:"accenture", status:"deployed", url:"https://aware-framework.accenture.com/",
     desc:"AI-powered unified SaaS security platform that seamlessly automates vulnerability detection via prompt engineering, correlation, and remediation across applications and code within a single ecosystem. Covers 6 major security services: SAST, DAST, SCA, PenTest, Cloud Config Review and Infra VM.",
     services:["secure-code","pentest","ctem","cloud"],
@@ -381,8 +430,8 @@ const TOOLS = [
     ]
   },
   {
-    id:"adi", name:"ADI", acro:"Automated DevSecOps Integrator",
-    source:"accenture", status:"deployed",
+    id:"adi", order:6, name:"ADI", acro:"Automated DevSecOps Integrator",
+    source:"accenture", status:"deployed", url:"https://aware-framework.accenture.com/adi/",
     desc:"ADI accelerates DevSecOps adoption through AI-driven pipeline automation, intelligent security scanning, automated false positive analysis, real-time vulnerability visibility, and AI-powered remediation assistance. LLM-based pipeline script generation for Azure DevOps, Jenkins and GitHub.",
     services:["secure-sdlc"],
     offerings:["devsecops"],
@@ -403,7 +452,7 @@ const TOOLS = [
     ]
   },
   {
-    id:"aegis", name:"AEGIS", acro:"AI Endpoint Guardrail & Inspection System",
+    id:"aegis", order:5, name:"AEGIS", acro:"AI Endpoint Guardrail & Inspection System",
     source:"accenture", status:"deployed", url:"http://3.6.103.74:8080/",
     desc:"AEGIS is an AI-powered LLM security validation platform that runs 40+ probe families (~2,000 adversarial prompts) against any GenAI endpoint. One-click scan from target to Accenture-branded evidence pack. Powered by open-source garak (NVIDIA) engine — $0 engine license cost with ~40% effort reduction vs manual AI/LLM security.",
     services:["ai-sec","pentest"],
@@ -421,8 +470,8 @@ const TOOLS = [
     ]
   },
   {
-    id:"aaria", name:"AARIA", acro:"Automated Architecture Review & Intelligent Attack Modelling",
-    source:"accenture", status:"deployed",
+    id:"aaria", order:7, name:"AARIA", acro:"Automated Architecture Review & Intelligent Attack Modelling",
+    source:"accenture", status:"deployed", url:"https://aware-framework.accenture.com/aaria/",
     desc:"AI-powered architecture security review platform. Five-agent pipeline on AWS Bedrock automates threat modelling, compliance mapping (PCI-DSS, HIPAA, DORA, ISO 27001) and security assessments. Delivers DFD generation, evidence validation and STRIDE-based threat modelling.",
     services:["secure-sdlc","ai-sec"],
     offerings:["design-review","ai-arch"],
@@ -440,7 +489,7 @@ const TOOLS = [
     ]
   },
   {
-    id:"aitm", name:"AITM", acro:"AI Integrated Threat Modelling",
+    id:"aitm", order:8, name:"AITM", acro:"AI Integrated Threat Modelling",
     source:"accenture", status:"deployed",
     desc:"AI-powered threat modelling platform for LLM-based and agentic AI systems. Architecture-specific questionnaire (22+ base + 10+ AI-generated controls) cross-checks source code and maps findings to STRIDE, OWASP LLM Top 10, MITRE ATLAS and NIST AI RMF.",
     services:["secure-sdlc","ai-sec"],
@@ -461,7 +510,7 @@ const TOOLS = [
     ]
   },
   {
-    id:"offsecone", name:"OffSecOne", acro:"Integrated OffSec Managed Services Platform",
+    id:"offsecone", order:9, name:"OffSecOne", acro:"Integrated OffSec Managed Services Platform",
     source:"accenture", status:"progress",
     desc:"All-in-One Security Review Console. Unified delivery across all offensive service lines — one team, one platform, from scoping to reporting. Backed by 50+ full-stack security engineers (ETA Aug 2026), proprietary OffSec Platform (ETA Dec 2026), and tool evaluation across the full offensive security stack. Integrates with XBOW for autonomous testing.",
     services:["pentest","cas","cloud"],
@@ -485,7 +534,7 @@ const TOOLS = [
     ]
   },
   {
-    id:"aiae", name:"AIAE", acro:"Actionable Intelligence API Enablement",
+    id:"aiae", order:10, name:"AIAE", acro:"Actionable Intelligence API Enablement",
     source:"accenture", status:"progress",
     desc:"OSINT-driven correlated intelligence platform for external attack surface management, threat intelligence enrichment and attack surface discovery. Feeds CTEM and Cyber Attack Simulation workflows with real-time exposure data.",
     services:["ctem","cas"],
@@ -502,7 +551,7 @@ const TOOLS = [
     ]
   },
   {
-    id:"cloud-inspector", name:"Cloud Inspector", acro:"Cloud Configuration & Posture Review Platform",
+    id:"cloud-inspector", order:11, name:"Cloud Inspector", acro:"Cloud Configuration & Posture Review Platform",
     source:"accenture", status:"progress",
     desc:"Cloud-native configuration review platform covering AWS, Azure, GCP and custom cloud environments. Automated posture assessment against CIS benchmarks, misconfiguration detection and IAM analysis.",
     services:["config"],
@@ -523,7 +572,7 @@ const TOOLS = [
     ]
   },
   {
-    id:"xbow", name:"XBOW", acro:"Autonomous Offensive Security Platform (Strategic Partner)",
+    id:"xbow", order:4, name:"XBOW", acro:"Autonomous Offensive Security Platform (Strategic Partner)",
     source:"partner", status:"deployed", url:"https://xbow.com",
     desc:"AI-powered autonomous penetration testing platform (Accenture Ventures investee, May 2026). Autonomous agents discover, chain and exploit real vulnerabilities at machine speed with deterministic validation. Near-zero false positives, SOC2/ISO 27001/PCI DSS/NIS 2 compliant reporting. Integrated with Microsoft Security Copilot and Sentinel. Strategic partnership announced with Accenture in Slide 15 of the Cyber Resilience Portfolio Overview.",
     services:["pentest","ctem","cas"],
@@ -539,8 +588,142 @@ const TOOLS = [
       {n:"Deterministic Validator",d:"Confirms exploitability with non-destructive PoC challenges",o:"—"},
       {n:"Shared Execution Environment",d:"Industry-standard tools + steerable headless browser",o:"—"}
     ]
+  },
+  {
+    id:"apa", order:3, name:"Agentic Pentest Assistant", acro:"AI-Powered Multi-Agent Penetration Testing Co-pilot",
+    source:"global", status:"deployed",
+    desc:"A Generative AI agentic capability designed to aid pentest analysts throughout pen testing operations — collaboratively planning and executing tasks, offering timely expert guidance, and generating reports. Four-layer multi-agent hierarchy (Strategic · Coordination · Tactical · Intelligence) with MCP-based tool integration.",
+    services:["pentest","cas"],
+    offerings:["web-pt","api-pt","infra-pt","mobile-pt","thick-pt","llm-pt","product-pt","bas","red-team"],
+    metrics:{"Report savings":"60%","Triage reduction":"50%","Workflow":"30%",Agents:"16+"},
+    clients:["Cyber Resilience Practice"],
+    subServices:["Attack Planning","Dynamic Advice","Tool Integration (MCP)","Report Generation","Reconnaissance","Vulnerability Identification","Testing","Evidence Collection"],
+    integrations:["Burp Suite Pro","ZAP","SPLX","Cisco AI Validation","Kali","MCP Protocol","MongoDB","ElasticSearch"],
+    architecture:"4-layer hierarchy: Strategic → Coordination → Tactical → Intelligence · SaaS or On-Premises",
+    agents:[
+      {n:"Strategy Agent",d:"Engagement planning, phase transitions",o:"—"},
+      {n:"Prerequisite Agent",d:"Auth & credential analysis",o:"—"},
+      {n:"Conversation Agent",d:"User interaction & clarification",o:"—"},
+      {n:"Reporting Agent",d:"Finding synthesis & report generation",o:"60%"},
+      {n:"Coordination Engine",d:"Task queue, retry logic orchestration",o:"—"},
+      {n:"Phase Evaluator",d:"10 tools, 4-layer validation",o:"—"},
+      {n:"Rapid Triage Manager",d:"Fast-path exploit detection",o:"50%"},
+      {n:"Inter-Iteration Planner",d:"Artifact auditing between iterations",o:"—"},
+      {n:"Recon Agent",d:"Discovery, mapping, tech identification",o:"—"},
+      {n:"Vuln Agent",d:"Systematic testing, evidence-gated",o:"—"},
+      {n:"Specialist Agents (10+)",d:"SQLi, XSS, SSTI, SSRF, JWT, BOLA",o:"—"},
+      {n:"Validation Agent",d:"Finding correlation & validation",o:"—"},
+      {n:"Finding Intelligence",d:"Coverage matrix, attack chains",o:"—"},
+      {n:"Curl Intelligence",d:"SSTI/CSRF detect, response dedup",o:"—"},
+      {n:"Payload Adaptation",d:"Per-target payload optimization",o:"—"},
+      {n:"Project Memory",d:"3-tier memory: short/mid/long-term",o:"—"}
+    ]
+  },
+  {
+    id:"cyberai", order:2, name:"Cyber.AI Platform", acro:"AI-Powered Consulting Intelligence & Advisory Orchestrator", url:"https://cyberai.accenture.com/login",
+    source:"global", status:"deployed",
+    desc:"Accenture's AI-powered cybersecurity intelligence layer — 24 specialized agents orchestrated across 15+ structured missions covering all Cyber Resilience services. Provides preflight-gated, anti-hallucination advisory for strategic program design, risk assessment, and cross-service intelligence.",
+    services:["secure-code","secure-sdlc","ctem","pentest","ai-sec","cas","config","cloud"],
+    offerings:["sast","sca","devsecops","design-review","vuln-scan","dast","asm","web-pt","api-pt","infra-pt","llm-pt","ai-arch","ai-code","ai-config","llm-red","bas","red-team","threat-intel","cloud-cfg","cloud-pt"],
+    metrics:{"Missions":"15+",Agents:"24",Domains:"8",Services:"32"},
+    clients:["Cyber Resilience Practice-wide"],
+    subServices:["Strategic Advisory","Mission Orchestration","Compliance Guidance","Risk Assessment","Cross-service Intelligence","Deep-Dive Workbench"],
+    integrations:["72 tool integrations","Anti-hallucination preflight","Deep-Dive Workbench","Null-over-fiction gate"],
+    architecture:"Brain + Agent Hub + Knowledge Engine & Ontology",
+    agents:[
+      {n:"vuln_commander",d:"Vulnerability response & prioritisation",o:"—"},
+      {n:"appsec_advisor",d:"Application security program design",o:"—"},
+      {n:"offensive_security_advisor",d:"Strategic offensive security guidance",o:"—"},
+      {n:"threat_intel_strategist",d:"Threat intelligence program strategy",o:"—"},
+      {n:"ai_security_advisor",d:"AI security governance & assessment",o:"—"},
+      {n:"grc_advisor",d:"Governance, risk & compliance advisory",o:"—"},
+      {n:"cloud_security_architect",d:"Cloud security posture & architecture",o:"—"},
+      {n:"soc_strategist",d:"SOC design & optimisation",o:"—"},
+      {n:"incident_response_advisor",d:"Crisis & incident response advisory",o:"—"},
+      {n:"partner_advisor",d:"Partner & vendor assessment",o:"—"}
+    ]
   }
 ];
+
+/* Cyber.AI Mission Mapping — from CRM Coverage in Cyber.AI deck Slide 11 */
+const CYBERAI = {
+  platform:{
+    name:"Cyber.AI Platform",
+    tagline:"AI-Powered · Mission-Driven · Always-On",
+    stats:{services:32,agents:24,domains:8,missions:"15+"},
+    desc:"Accenture's AI-powered cybersecurity intelligence layer — 24 specialized agents orchestrated across 15+ structured missions. Not a replacement for operational tools, but the advisory brain that designs the optimal approach for every engagement."
+  },
+  missions:{
+    "secure-code":{
+      missions:[
+        {name:"AppSec Program",agents:["vuln_commander","appsec_advisor"]},
+        {name:"Supply Chain Risk Assessment",agents:["grc_advisor","supply_chain_risk_manager"]}
+      ],
+      stats:{services:4,missions:2,agents:4},
+      keyOutcomes:["Shift-left security embedded in CI/CD","Reduced mean time to detect code vulnerabilities","Full open-source dependency visibility & SBOM compliance"]
+    },
+    "ctem":{
+      missions:[
+        {name:"Vulnerability Response",agents:["vuln_commander","soc_triage_risk_advisor"]},
+        {name:"Vulnerability Remediation Orchestration",agents:["vuln_commander","vulnerability_remediation_orchestrator"]}
+      ],
+      stats:{services:4,missions:2,agents:3},
+      keyOutcomes:["Continuous real-time exposure visibility","Risk-prioritized remediation reduces critical exposure time","SLA-driven remediation with measurable MTTR improvement"]
+    },
+    "secure-sdlc":{
+      missions:[
+        {name:"AppSec Program",agents:["vuln_commander","appsec_advisor"]},
+        {name:"Security Architecture Review",agents:["partner_advisor","iga_architect","soc_strategist","grc_advisor","security_rationalist"]}
+      ],
+      stats:{services:2,missions:2,agents:6},
+      keyOutcomes:["Security embedded at every SDLC stage","Automated policy enforcement in CI/CD","Architecture flaws identified before production"]
+    },
+    "pentest":{
+      missions:[
+        {name:"Offensive Security Program",agents:["threat_intel_strategist","offensive_security_advisor"]},
+        {name:"Agentic AI Security Program",agents:["security_rationalist","ai_security_advisor","agentic_identity_architect","llm_runtime_advisor"]},
+        {name:"OT Security Assessment",agents:["partner_advisor","vuln_commander","ot_security_advisor"]}
+      ],
+      stats:{services:8,missions:3,agents:9},
+      keyOutcomes:["Full-spectrum offensive coverage — web, mobile, cloud, AI & OT","Specialist AI/LLM testing against emerging threats","Actionable remediation roadmap with risk-ranked findings"]
+    },
+    "cas":{
+      missions:[
+        {name:"Crisis Simulation",agents:["incident_response_advisor","threat_intel_strategist","offensive_security_advisor"]},
+        {name:"Threat Intel Program",agents:["soc_strategist","threat_intel_strategist","soc_triage_risk_advisor"]},
+        {name:"Offensive Security Program",agents:["threat_intel_strategist","offensive_security_advisor"]}
+      ],
+      stats:{services:4,missions:3,agents:5},
+      keyOutcomes:["Security control gaps exposed before attackers find them","MITRE ATT&CK coverage continuously improved","Threat hunting reduces attacker dwell time to near-zero"]
+    },
+    "ai-sec":{
+      missions:[
+        {name:"Agentic AI Security Program",agents:["security_rationalist","ai_security_advisor","agentic_identity_architect","a2a_protocol_advisor","llm_runtime_advisor","agentic_ai_program_strategist"]},
+        {name:"AI Security Governance",agents:["grc_advisor","ai_security_advisor"]}
+      ],
+      stats:{services:4,missions:2,agents:7},
+      keyOutcomes:["AI-native threat models for every architecture","LLM attack surface continuously assessed & hardened","AI governance embedded in compliance frameworks"]
+    },
+    "config":{
+      missions:[
+        {name:"Cloud Security Assessment",agents:["partner_advisor","cloud_security_architect","cloud_security_triage_analyst"]},
+        {name:"Resilience Assessment",agents:["partner_advisor","grc_advisor","cloud_security_architect","incident_response_advisor"]},
+        {name:"Oracle DB Assessment",agents:["nist_assessment_advisor","grc_advisor"]}
+      ],
+      stats:{services:4,missions:3,agents:5},
+      keyOutcomes:["Multi-cloud config drift detected continuously","CIS benchmark compliance enforced at scale","Database hardening validated against industry standards"]
+    },
+    "cloud":{
+      missions:[
+        {name:"Offensive Security Program",agents:["threat_intel_strategist","offensive_security_advisor"]},
+        {name:"Cloud Security Assessment",agents:["partner_advisor","cloud_security_architect","cloud_security_triage_analyst"]},
+        {name:"Resilience Assessment",agents:["partner_advisor","soc_strategist","grc_advisor","cloud_security_architect","incident_response_advisor","cloud_security_triage_analyst"]}
+      ],
+      stats:{services:4,missions:3,agents:6},
+      keyOutcomes:["Multi-cloud attack surface continuously tested","Container & K8s environments hardened end-to-end","Cloud compliance posture assessed against major frameworks"]
+    }
+  }
+};
 
 
 /* Icons */
@@ -595,16 +778,36 @@ function resetAll(){
    RENDERERS
    ============================================================ */
 function renderSidebar(){
+  /* Step tracker */
+  const stepsEl = document.getElementById('sb-steps');
+  if(stepsEl){
+    const steps = [{n:1,l:"Service"},{n:2,l:"Offering"},{n:3,l:"Tools"},{n:4,l:"Details"}];
+    stepsEl.innerHTML = steps.map((s,i)=>{
+      const cls = currentStep===s.n ? 'active' : (currentStep>s.n ? 'done' : '');
+      const line = i<steps.length-1 ? `<div class="sb-step-line ${currentStep>s.n?'done':''}"></div>` : '';
+      return `<div class="sb-step ${cls}"><div class="dot">${cls==='done'?'✓':s.n}</div><div class="lbl">${s.l}</div></div>${line}`;
+    }).join('');
+  }
+
+  /* Services */
   const el = document.getElementById('sb-services');
   el.innerHTML = SERVICES.map(s=>{
-    const cnt = TOOLS.filter(t=>t.services.includes(s.id)).length;
     const isOn = selectedServices.has(s.id);
     const isDev = s.status === 'dev';
     return `<div class="sb-item ${isOn?'on':''} ${isDev?'dev':''}" onclick="${isDev?'':'toggleServiceFromSidebar(\''+s.id+'\')'}">
       <span>${s.name}</span>
-      ${isDev?`<span class="dev-tag">SOON</span>`:`<span class="cnt">${cnt}</span>`}
+      ${isDev?`<span class="dev-tag">SOON</span>`:''}
     </div>`;
   }).join('');
+
+  /* Cyber.AI — same style as service items */
+  const aiEl = document.getElementById('sb-cyberai-item');
+  if(aiEl){
+    const isOn = currentToolId === 'cyberai' && currentStep === 4;
+    aiEl.innerHTML = `<div class="sb-item ${isOn?'on':''}" onclick="goToStep(4,'cyberai')">
+      <span>Cyber.AI Platform</span>
+    </div>`;
+  }
 }
 
 function toggleServiceFromSidebar(id){
@@ -628,7 +831,7 @@ function renderBreadcrumb(){
     ${steps.map((s,i)=>{
       const cls = currentStep===s.n ? 'active' : (currentStep>s.n ? 'done' : '');
       const clickable = currentStep>s.n;
-      return `<span class="b-step ${cls}" ${clickable?`onclick="goToStep(${s.n})" style="cursor:pointer"`:''}>${s.l}</span>${i<steps.length-1?'<span class="b-arrow">›</span>':''}`;
+      return `<span class="b-step ${cls}" ${clickable?`onclick="goToStep(${s.n})" style="cursor:pointer"`:''}>${s.l}</span>${i<steps.length-1?'<span class="b-arrow">»</span>':''}`;
     }).join('')}
   </div>`;
 }
@@ -682,11 +885,8 @@ function renderStep1(){
       <div class="sel-card-icon">${ICONS[s.icon]||''}</div>
       <div class="sel-card-name">${s.name}</div>
       <div class="sel-card-desc">${s.desc}</div>
-      ${s.foot ? `<div style="font-size:10.5px;color:var(--brand-2);background:var(--brand-bg);padding:6px 10px;border-radius:6px;font-weight:600;line-height:1.4;margin-top:2px">${s.foot}</div>`:''}
       <div class="sel-card-meta">
-        ${isDev?`<span class="m" style="color:var(--amber);font-weight:700">Under Development</span>`:`
-        <span class="m"><b>${offCount}</b> offerings</span>
-        <span class="m"><b>${toolCount}</b> tools</span>`}
+        ${isDev?`<span class="m" style="color:var(--amber);font-weight:700">Under Development</span>`:``}
       </div>
     </div>`;
   }).join('');
@@ -749,15 +949,11 @@ function renderStep2(){
       <div class="card-grid">
         ${offs.map(o=>{
           const isOn = selectedOfferings.has(o.id);
-          const isPlanned = o.status === 'planned';
           const isProgress = o.status === 'progress';
-          const statusBadge = isPlanned
-            ? `<span style="position:absolute;top:12px;left:12px;font-size:9px;font-weight:700;background:var(--amber-bg);color:var(--amber);padding:3px 8px;border-radius:999px;letter-spacing:.04em">To Be Initiated</span>`
-            : isProgress
-              ? `<span style="position:absolute;top:12px;left:12px;font-size:9px;font-weight:700;background:#fff7ed;color:#c2410c;padding:3px 8px;border-radius:999px;letter-spacing:.04em">In Progress</span>`
-              : '';
-          const dimStyle = isPlanned ? 'opacity:.7' : '';
-          return `<div class="sel-card ${isOn?'on':''}" data-off="${o.id}" style="min-height:120px;padding-top:${(isPlanned||isProgress)?'34px':'20px'};${dimStyle}">
+          const statusBadge = isProgress
+            ? `<span style="position:absolute;top:12px;left:12px;font-size:9px;font-weight:700;background:#fff7ed;color:#c2410c;padding:3px 8px;border-radius:999px;letter-spacing:.04em">In Progress</span>`
+            : '';
+          return `<div class="sel-card ${isOn?'on':''}" data-off="${o.id}" style="min-height:120px;padding-top:${isProgress?'34px':'20px'}">
             ${statusBadge}
             <div class="sel-card-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
             <div class="sel-card-name" style="font-size:14px;padding-right:32px">${o.name}</div>
@@ -819,40 +1015,8 @@ function renderStep3(){
     ${renderBreadcrumb()}
     ${renderSelStrip()}
     <div class="page-head">
-      <h1 class="page-title">Matching tools <span style="font-size:18px;color:var(--muted);font-weight:600">(${list.length})</span></h1>
-      <p class="page-sub">Tools below match your selected services${selectedOfferings.size>0?' and offerings':''}. Use filters to narrow further. Click any tool for full details.</p>
-    </div>
-
-    <!-- Filter bar -->
-    <div class="tool-filter-bar">
-      <div class="tool-filter-row">
-        <div class="tf-lbl">
-          Filter by Service
-          ${filterSvc.size > 0 ? `<span class="tf-clear" id="clear-svc-filter">Clear</span>`:''}
-        </div>
-        <div class="tf-pills" id="svc-filter-pills">
-          ${selSvcList.map(s=>{
-            const isOn = filterSvc.has(s.id);
-            const cnt = TOOLS.filter(t=>t.services.includes(s.id) && t.services.some(sv=>selectedServices.has(sv))).length;
-            return `<button class="tf-pill ${isOn?'svc-on':''}" data-svc="${s.id}">${s.name} <span class="cnt">${cnt}</span></button>`;
-          }).join('')}
-        </div>
-      </div>
-      ${selOffList.length > 0 ? `
-      <div class="tool-filter-row">
-        <div class="tf-lbl">
-          Filter by Offering
-          ${filterOff.size > 0 ? `<span class="tf-clear" id="clear-off-filter">Clear</span>`:''}
-        </div>
-        <div class="tf-pills" id="off-filter-pills">
-          ${selOffList.map(o=>{
-            const isOn = filterOff.has(o.id);
-            const cnt = TOOLS.filter(t=>t.offerings.includes(o.id)).length;
-            return `<button class="tf-pill ${isOn?'off-on':''}" data-off="${o.id}">${o.name} <span class="cnt">${cnt}</span></button>`;
-          }).join('')}
-        </div>
-      </div>`:''
-      }
+      <h1 class="page-title" style="font-size:20px">Matching tools <span style="font-size:14px;color:var(--muted);font-weight:600">(${list.length})</span></h1>
+      <p class="page-sub">Tools below match your selected services${selectedOfferings.size>0?' and offerings':''}. Click any tool for full details.</p>
     </div>
 
     <div id="tool-list"></div>
@@ -866,36 +1030,18 @@ function renderStep3(){
     </div>
   `;
 
-  /* Wire filter clicks */
-  document.querySelectorAll('#svc-filter-pills .tf-pill').forEach(p=>{
-    p.addEventListener('click',()=>{
-      const id = p.dataset.svc;
-      if(filterSvc.has(id)) filterSvc.delete(id); else filterSvc.add(id);
-      renderStep3();
-    });
-  });
-  document.querySelectorAll('#off-filter-pills .tf-pill').forEach(p=>{
-    p.addEventListener('click',()=>{
-      const id = p.dataset.off;
-      if(filterOff.has(id)) filterOff.delete(id); else filterOff.add(id);
-      renderStep3();
-    });
-  });
-  document.getElementById('clear-svc-filter')?.addEventListener('click',()=>{filterSvc.clear();renderStep3();});
-  document.getElementById('clear-off-filter')?.addEventListener('click',()=>{filterOff.clear();renderStep3();});
-
   /* Render tool cards */
   const listEl = document.getElementById('tool-list');
   if(list.length === 0){
     listEl.innerHTML = `<div class="empty">
       <div class="ic">🔎</div>
       <div class="t">We are working on this</div>
-      <div class="s">Tool mapping for this combination is in progress. Try selecting a different service or offering, or remove some filters above.</div>
+      <div class="s">Tool mapping for this combination is in progress. Try selecting a different service or offering.</div>
     </div>`;
     return;
   }
 
-  listEl.innerHTML = `<div class="tool-grid">${list.map(t=>{
+  listEl.innerHTML = `<div class="tool-grid">${list.sort((a,b)=>(a.order||99)-(b.order||99)).map(t=>{
     /* Services this tool covers that the user selected */
     const coveredSvcs = t.services
       .filter(s=>selectedServices.has(s))
@@ -929,21 +1075,16 @@ function renderStep3(){
         </div>
         <span class="tool-source ${t.source}">${sourceLbl}</span>
       </div>
-      <div class="tool-card-desc">${t.desc.slice(0,160)}${t.desc.length>160?'…':''}</div>
+      <div class="tool-card-desc">${t.desc.slice(0,130)}${t.desc.length>130?'…':''}</div>
       <div class="tool-card-supports">
-        <div class="lbl">Services Covered (${coveredSvcs.length})</div>
+        <div class="lbl">Services Covered</div>
         ${coveredSvcs.map(s=>`<div class="item">${s.name}</div>`).join('')}
       </div>
       ${coveredOffs.length > 0 ? `
       <div class="tool-card-supports" style="background:var(--teal-bg);margin-top:0">
-        <div class="lbl" style="color:var(--teal)">Offerings Covered (${coveredOffs.length})</div>
-        ${coveredOffs.map(o=>`<div class="item" style="--green:var(--teal)">${o.name}</div>`).join('')}
-      </div>`:''}
-      <div class="tool-card-meta">
-        <span class="m"><b>${t.agents.length}</b> agents</span>
-        <span class="m"><b>${t.subServices.length}</b> sub-services</span>
-        <span class="m"><b>${t.integrations.length}</b> integrations</span>
-      </div>
+        <div class="lbl" style="color:var(--teal)">Offerings Covered</div>
+        ${coveredOffs.map(o=>`<div class="item" style="color:var(--teal)">${o.name}</div>`).join('')}
+      </div>` : ''}
       <button class="tool-card-cta">
         View Details
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
