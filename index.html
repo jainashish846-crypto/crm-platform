@@ -1,0 +1,1474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cyber Resilience Unified Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f5f9;
+    --panel:#ffffff;
+    --ink:#0c1024;
+    --ink-2:#1a1d36;
+    --muted:#5a607a;
+    --muted-2:#8a91aa;
+    --line:#e4e6f0;
+    --line-2:#eef0f6;
+    --brand:#a100ff;
+    --brand-2:#7400b8;
+    --brand-3:#e1c8ff;
+    --brand-bg:#fdfaff;
+    --teal:#00b4a6;
+    --teal-bg:#e6faf8;
+    --amber:#d97706;
+    --amber-bg:#fffbeb;
+    --green:#059669;
+    --green-bg:#ecfdf5;
+    --chip:#f1f3fa;
+    --radius:14px;
+    --shadow-sm:0 1px 2px rgba(12,16,36,.04),0 1px 3px rgba(12,16,36,.04);
+    --shadow:0 4px 24px -8px rgba(12,16,36,.10),0 2px 8px -2px rgba(12,16,36,.06);
+    --shadow-lg:0 24px 60px -20px rgba(12,16,36,.20),0 8px 24px -8px rgba(12,16,36,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:0;background:transparent;color:inherit}
+
+  /* ========= LOGIN PAGE ========= */
+  #page-login{position:fixed;inset:0;background:linear-gradient(135deg,#0a0018 0%,#1a0033 40%,#3d0066 70%,#7400b8 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:100}
+  #page-login::before{content:"";position:absolute;top:-200px;right:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(161,0,255,.30) 0%,transparent 70%);pointer-events:none}
+  #page-login::after{content:"";position:absolute;bottom:-200px;left:-200px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(0,180,166,.20) 0%,transparent 70%);pointer-events:none}
+  .login-card{position:relative;z-index:2;text-align:center;color:#fff;padding:40px;max-width:640px;animation:fadeIn .6s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .login-brand{display:inline-flex;align-items:center;gap:12px;margin-bottom:32px}
+  .login-brand .gt{font-size:36px;font-weight:800;color:#a100ff;line-height:1}
+  .login-brand-txt{font-size:14px;font-weight:600;letter-spacing:.10em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+  .login-title{font-size:52px;font-weight:800;letter-spacing:-.03em;line-height:1.05;margin:0 0 20px}
+  .login-taglines{display:flex;flex-direction:column;gap:8px;margin:32px 0 44px;font-size:19px;font-weight:500;color:rgba(255,255,255,.90);letter-spacing:-.01em}
+  .login-taglines .l{display:inline-flex;align-items:center;justify-content:center;gap:10px}
+  .login-taglines .l::before{content:"";width:6px;height:6px;background:var(--brand);border-radius:50%}
+  .login-btn{display:inline-flex;align-items:center;gap:10px;padding:16px 40px;background:linear-gradient(135deg,#a100ff,#7400b8);color:#fff;border:0;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 8px 32px rgba(161,0,255,.40);transition:all .2s;letter-spacing:.02em}
+  .login-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(161,0,255,.55)}
+  .login-btn svg{width:18px;height:18px}
+  .login-footer{margin-top:40px;font-size:12px;color:rgba(255,255,255,.55);letter-spacing:.04em}
+
+  /* ========= APP LAYOUT ========= */
+  #app{display:none;min-height:100vh}
+  #app.on{display:grid;grid-template-columns:260px 1fr}
+  @media(max-width:900px){#app.on{grid-template-columns:1fr}}
+  .app-topbar{display:none}
+  @media(max-width:900px){
+    .app-topbar{display:flex;align-items:center;justify-content:space-between;background:#0f0322;color:#fff;padding:12px 20px;position:sticky;top:0;z-index:20}
+    .app-topbar .tb-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;cursor:pointer}
+  }
+
+  /* ========= SIDEBAR ========= */
+  .sidebar{background:#0f0322;color:#fff;padding:0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  @media(max-width:900px){.sidebar{position:relative;height:auto}}
+  .sb-brand{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}
+  .sb-brand:hover{background:rgba(255,255,255,.03)}
+  .sb-brand .gt-box{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#7400b8,#a100ff);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;box-shadow:0 4px 14px rgba(161,0,255,.40);flex-shrink:0;letter-spacing:-.02em}
+  .sb-brand-txt{font-size:16px;font-weight:800;letter-spacing:-.015em;line-height:1.15}
+  .sb-brand-sub{font-size:10px;color:#a100ff;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+
+  /* Step tracker in sidebar */
+  .sb-steps{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:0}
+  .sb-step{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;position:relative}
+  .sb-step .dot{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.20);background:transparent;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(255,255,255,.35);transition:all .15s}
+  .sb-step.done .dot{background:#a100ff;border-color:#a100ff;color:#fff}
+  .sb-step.active .dot{background:linear-gradient(135deg,#a100ff,#7400b8);border-color:#a100ff;color:#fff;box-shadow:0 0 10px rgba(161,0,255,.50)}
+  .sb-step .lbl{font-size:7.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.30);text-align:center;white-space:nowrap}
+  .sb-step.done .lbl,.sb-step.active .lbl{color:rgba(255,255,255,.75)}
+  .sb-step-line{flex:0 0 auto;width:20px;height:2px;background:rgba(255,255,255,.10);margin-top:-10px}
+  .sb-step-line.done{background:#a100ff}
+
+  .sb-section{padding:0 10px;margin-bottom:10px;margin-top:12px}
+  .sb-section-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:0 8px;margin-bottom:6px}
+  .sb-item{padding:8px 12px;border-radius:8px;font-size:13px;font-weight:500;color:rgba(255,255,255,.70);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:all .12s;margin-bottom:1px}
+  .sb-item:hover{background:rgba(255,255,255,.06);color:#fff}
+  .sb-item.on{background:linear-gradient(135deg,#7400b8,#a100ff);color:#fff;font-weight:600}
+  .sb-item .cnt{font-size:11px;background:rgba(255,255,255,.15);padding:2px 8px;border-radius:999px;font-weight:600}
+  .sb-item.on .cnt{background:rgba(255,255,255,.25)}
+  .sb-item.dev{opacity:.55}
+  .sb-item .dev-tag{font-size:9px;background:var(--amber);color:#fff;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:.04em}
+  .sb-nav{padding:12px 20px;font-size:11px;color:rgba(255,255,255,.40);border-top:1px solid rgba(255,255,255,.06);margin-top:auto}
+  .sb-nav a{display:block;padding:6px 0;color:rgba(255,255,255,.55);cursor:pointer}
+  .sb-nav a:hover{color:#fff}
+
+  /* ========= MAIN AREA ========= */
+  .main{padding:32px 44px 60px;min-height:100vh}
+  @media(max-width:900px){.main{padding:20px 20px 40px}}
+
+  /* Breadcrumb + selected badge strip */
+  .breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:10px;flex-wrap:wrap}
+  .breadcrumb .b-step{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:999px;background:linear-gradient(135deg,rgba(116,0,184,.15),rgba(161,0,255,.15));border:1.5px solid rgba(161,0,255,.30);font-weight:600;font-size:13px;color:var(--brand2)}
+  .breadcrumb .b-step.done{background:linear-gradient(135deg,rgba(116,0,184,.20),rgba(161,0,255,.20));border-color:rgba(161,0,255,.40);color:var(--brand2)}
+  .breadcrumb .b-step.done::before{content:"✓ ";font-weight:700}
+  .breadcrumb .b-step.active{background:linear-gradient(135deg,#7400b8,#a100ff);border-color:transparent;color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(161,0,255,.35)}
+  .breadcrumb .b-arrow{color:var(--brand);font-size:16px;font-weight:800;cursor:default;padding:0}
+
+  .sel-strip{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:18px 0 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .sel-strip .sl{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .sel-strip .sc{font-size:14px;font-weight:600;padding:7px 14px;background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2);border-radius:999px;display:inline-flex;align-items:center;gap:6px}
+  .sel-strip .sc-off{background:var(--teal-bg);color:var(--teal)}
+  .sel-strip .change{margin-left:auto;font-size:13px;font-weight:600;color:var(--brand-2);cursor:pointer;padding:6px 14px;border-radius:6px}
+  .sel-strip .change:hover{background:var(--brand-bg)}
+
+  .page-head{margin-bottom:16px}
+  .page-title{font-size:22px;font-weight:800;letter-spacing:-.025em;margin:0 0 6px;background:linear-gradient(135deg,#7400b8,#a100ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .page-sub{font-size:14.5px;color:var(--muted);line-height:1.55;max-width:640px}
+
+  /* ========= SERVICE / OFFERING CARDS ========= */
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px}
+  .sel-card{background:#fff;border:2px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;transition:all .18s;position:relative;display:flex;flex-direction:column;gap:5px;min-height:auto}
+  .sel-card:hover{border-color:var(--brand-3);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .sel-card.on{border-color:var(--brand);background:linear-gradient(180deg,#fdfaff 0%,#fff 100%);box-shadow:0 0 0 3px rgba(161,0,255,.10)}
+  .sel-card.dev{opacity:.65;cursor:not-allowed}
+  .sel-card.dev:hover{transform:none;box-shadow:none;border-color:var(--line)}
+  .sel-card-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:5px;border:2px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s}
+  .sel-card.on .sel-card-check{background:linear-gradient(135deg,#7400b8,#a100ff);border-color:transparent;color:#fff}
+  .sel-card-check svg{width:10px;height:10px;opacity:0}
+  .sel-card.on .sel-card-check svg{opacity:1}
+  .sel-card-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2);display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+  .sel-card-icon svg{width:16px;height:16px}
+  .sel-card-name{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-.01em;line-height:1.25;padding-right:24px}
+  .sel-card-desc{font-size:11.5px;color:var(--muted);line-height:1.4;flex:1}
+  .sel-card-meta{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:600;color:var(--muted);margin-top:4px}
+  .sel-card-meta .m{display:inline-flex;align-items:center;gap:4px}
+  .sel-card .dev-badge{position:absolute;top:10px;left:10px;font-size:9px;font-weight:700;background:var(--amber-bg);color:var(--amber);padding:2px 6px;border-radius:999px;letter-spacing:.04em}
+
+  /* ========= CTA / STEP FOOTER ========= */
+  .step-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px;flex-wrap:wrap}
+  .step-back{padding:10px 20px;background:#fff;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+  .step-back:hover{border-color:var(--brand-3);color:var(--ink)}
+  .step-next{padding:12px 26px;background:linear-gradient(135deg,#7400b8,#a100ff);color:#fff;border:0;border-radius:999px;font-size:13.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(161,0,255,.28);transition:all .15s}
+  .step-next:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 28px rgba(161,0,255,.40)}
+  .step-next:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .step-next svg{width:14px;height:14px}
+  .step-footer-hint{font-size:12px;color:var(--muted);flex:1;text-align:center}
+
+  /* ========= TOOL CARDS (PAGE 3) ========= */
+  .tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:24px}
+  .tool-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;cursor:pointer;transition:all .18s;position:relative;display:flex;flex-direction:column;min-height:280px}
+  .tool-card:hover{border-color:var(--brand-3);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .tool-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .tool-card-name{font-size:20px;font-weight:800;letter-spacing:-.015em;color:var(--ink);line-height:1.2;margin:0}
+  .tool-card-acro{font-size:10.5px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-top:4px;display:block}
+  .tool-source{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.04em;white-space:nowrap}
+  .tool-source.accenture{background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2)}
+  .tool-source.partner{background:var(--amber-bg);color:var(--amber)}
+  .tool-source.global{background:var(--teal-bg);color:var(--teal)}
+  .tool-card-desc{font-size:13px;line-height:1.55;color:var(--muted);margin:6px 0 14px;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .tool-card-supports{background:var(--brand-bg);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+  .tool-card-supports .lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-2);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+  .tool-card-supports .item{font-size:12px;color:var(--ink-2);padding:2px 0;display:flex;align-items:center;gap:6px;font-weight:500}
+  .tool-card-supports .item::before{content:"✓";color:var(--green);font-weight:700;flex-shrink:0}
+  .tool-card-meta{display:flex;align-items:center;gap:12px;font-size:11.5px;color:var(--muted);margin-bottom:12px;flex-wrap:wrap}
+  .tool-card-meta .m b{color:var(--ink);font-weight:600}
+  .tool-card-cta{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;background:var(--chip);color:var(--ink-2);border:1px solid var(--line);border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;margin-top:auto}
+  .tool-card-cta:hover{background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#fff;border-color:transparent}
+  .tool-card-cta svg{width:12px;height:12px}
+
+  /* Clean structured sections inside tool cards */
+  .tc-box{border:1px solid var(--line2);border-radius:10px;padding:11px 14px;margin-bottom:8px;position:relative}
+  .tc-box .tc-lbl{font-size:9px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+  .tc-box .tc-lbl::before{content:"";width:3px;height:10px;border-radius:2px;background:var(--line);flex-shrink:0}
+  .tc-box .tc-val{font-size:13px;font-weight:600;color:var(--ink);line-height:1.45}
+  .tc-box.purple{border-color:var(--brand-3);background:linear-gradient(135deg,#faf5ff,#f3e8ff);box-shadow:inset 0 0 0 1px rgba(161,0,255,.05)}
+  .tc-box.purple .tc-lbl{color:var(--brand-2)}
+  .tc-box.purple .tc-lbl::before{background:var(--brand)}
+  .tc-box.purple .tc-val{color:var(--brand-2);font-size:13px}
+  .tc-box.green{border-color:#86efac;background:linear-gradient(135deg,#f0fdf4,#dcfce7)}
+  .tc-box.green .tc-lbl{color:var(--green)}
+  .tc-box.green .tc-lbl::before{background:var(--green)}
+  .tc-box.green .tc-val{color:#065f46}
+  .tc-box.dark{border:none;background:linear-gradient(135deg,#1a0033,#4c0099);color:#fff;box-shadow:0 2px 8px rgba(161,0,255,.20)}
+  .tc-box.dark .tc-lbl{color:rgba(255,255,255,.55)}
+  .tc-box.dark .tc-lbl::before{background:rgba(255,255,255,.4)}
+  .tc-box.dark .tc-val{color:#fff;font-size:14px;font-weight:700}
+  .tc-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+  .tc-cell{background:linear-gradient(180deg,#fff,var(--chip));border:1px solid var(--line2);border-radius:10px;padding:10px 12px}
+  .tc-cell .tc-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+  .tc-cell .tc-lbl::before{content:"";width:3px;height:10px;border-radius:2px;background:var(--line);flex-shrink:0}
+  .tc-cell .tc-val{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .tc-cell.green{background:linear-gradient(180deg,#f0fdf4,#ecfdf5);border-color:#86efac}
+  .tc-cell.green .tc-lbl{color:var(--green)}
+  .tc-cell.green .tc-lbl::before{background:var(--green)}
+
+  .empty{text-align:center;padding:60px 20px;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:14px}
+  .empty .ic{font-size:44px;opacity:.4;margin-bottom:14px}
+  .empty .t{font-size:16px;font-weight:600;color:var(--ink-2);margin-bottom:4px}
+  .empty .s{font-size:13px}
+
+  /* Tool page filter bar */
+  .tool-filter-bar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:18px}
+  .tool-filter-row{margin-bottom:12px}
+  .tool-filter-row:last-child{margin-bottom:0}
+  .tool-filter-row .tf-lbl{font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .tool-filter-row .tf-pills{display:flex;flex-wrap:wrap;gap:6px}
+  .tf-pill{padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+  .tf-pill:hover{border-color:var(--brand-3);color:var(--ink)}
+  .tf-pill.on{background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#fff;border-color:transparent}
+  .tf-pill.svc-on{background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2);border-color:var(--brand-3)}
+  .tf-pill.off-on{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-bdr)}
+  .tf-pill .cnt{font-size:10px;opacity:.75}
+  .tf-clear{font-size:11px;color:var(--brand-2);cursor:pointer;font-weight:600;margin-left:8px;padding:2px 8px;border-radius:4px}
+  .tf-clear:hover{background:var(--brand-bg)}
+
+  /* Cyber.AI advisory panel */
+  .cyberai-panel{background:linear-gradient(135deg,#0a0018 0%,#1a0033 50%,#3d0066 100%);border-radius:14px;padding:24px;margin-top:24px;color:#fff;position:relative;overflow:hidden}
+  .cyberai-panel::before{content:"";position:absolute;right:-80px;top:-80px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(161,0,255,.20),transparent 70%);pointer-events:none}
+  .cyberai-panel .cp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .cyberai-panel .cp-title{font-size:18px;font-weight:800;letter-spacing:-.01em}
+  .cyberai-panel .cp-tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+  .cyberai-panel .cp-desc{font-size:12.5px;line-height:1.55;color:rgba(255,255,255,.75);max-width:600px;margin-bottom:16px}
+  .cyberai-panel .cp-stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+  .cyberai-panel .cp-stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 12px;min-width:80px}
+  .cyberai-panel .cp-stat .v{font-size:18px;font-weight:800;color:#fff}
+  .cyberai-panel .cp-stat .l{font-size:10px;color:rgba(255,255,255,.60);margin-top:1px}
+  .cyberai-missions{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+  .cyberai-mission{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:10px;padding:14px;transition:all .15s}
+  .cyberai-mission:hover{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.18)}
+  .cyberai-mission .cm-name{font-size:13px;font-weight:700;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .cyberai-mission .cm-name::before{content:"›";font-size:14px;font-weight:800}
+  .cyberai-mission .cm-agents{display:flex;flex-wrap:wrap;gap:4px}
+  .cyberai-mission .cm-agent{font-size:10px;padding:3px 8px;background:rgba(255,255,255,.10);border-radius:5px;color:rgba(255,255,255,.80);font-weight:500}
+  .cyberai-outcomes{margin-top:14px;display:flex;flex-direction:column;gap:4px}
+  .cyberai-outcomes .co{font-size:11.5px;color:rgba(255,255,255,.70);display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+  .cyberai-outcomes .co::before{content:"✓";color:#a7f3d0;font-weight:700;flex-shrink:0}
+
+  /* ========= TOOL DETAIL (PAGE 4) ========= */
+  .detail-hero{background:linear-gradient(135deg,#1a0033 0%,#3d0066 50%,#7400b8 100%);color:#fff;border-radius:16px;padding:30px 34px;margin-bottom:24px;position:relative;overflow:hidden}
+  .detail-hero::before{content:"";position:absolute;right:-60px;top:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.10),transparent 70%);pointer-events:none}
+  .detail-hero .badge-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .detail-hero .badge-row .b{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;letter-spacing:.04em;background:rgba(255,255,255,.15);color:#fff}
+  .detail-hero .badge-row .b.dep{background:rgba(31,184,125,.25);color:#a7f3d0}
+  .detail-hero .dt-name{font-size:36px;font-weight:800;letter-spacing:-.025em;margin:0 0 6px;line-height:1.1}
+  .detail-hero .dt-acro{font-size:14px;font-weight:600;color:rgba(255,255,255,.75);letter-spacing:.02em;margin-bottom:14px}
+  .detail-hero .dt-desc{font-size:15px;line-height:1.65;color:rgba(255,255,255,.88);max-width:720px}
+  .detail-hero .dt-actions{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap}
+  .dt-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .15s}
+  .dt-btn.primary{background:#fff;color:var(--brand-2)}
+  .dt-btn.primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.20)}
+  .dt-btn.ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
+  .dt-btn.ghost:hover{background:rgba(255,255,255,.20)}
+  .dt-btn svg{width:14px;height:14px}
+
+  .detail-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+  @media(max-width:880px){.detail-grid{grid-template-columns:1fr}}
+  .detail-panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+  .detail-panel .lbl{font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .detail-panel h3{font-size:15px;font-weight:700;margin:0 0 10px;color:var(--ink)}
+
+  .dp-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .dp-metric{background:var(--brand-bg);border-radius:8px;padding:12px 14px}
+  .dp-metric .v{font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.015em}
+  .dp-metric .l{font-size:11px;color:var(--muted);margin-top:2px}
+
+  .dp-list{display:flex;flex-direction:column;gap:6px}
+  .dp-list-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);padding:6px 0}
+  .dp-list-item::before{content:"✓";color:var(--green);font-weight:700}
+
+  .dp-pills{display:flex;flex-wrap:wrap;gap:5px}
+  .dp-pill{font-size:11.5px;padding:4px 10px;background:var(--chip);border-radius:999px;color:var(--ink-2);font-weight:500}
+  .dp-pill.brand{background:linear-gradient(135deg,#f3e7ff,#fde6ff);color:var(--brand-2)}
+
+  .agents-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:680px){.agents-list{grid-template-columns:1fr}}
+  .agent{background:var(--bg);border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .agent .a-name{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .agent .a-desc{font-size:11px;color:var(--muted);line-height:1.4;margin-top:2px}
+  .agent .a-opt{font-size:10px;font-weight:700;color:var(--brand);background:rgba(161,0,255,.08);padding:2px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+
+  /* mobile hamburger */
+  .mobile-menu{display:none;position:sticky;top:0;z-index:10;background:#0f0322;color:#fff;padding:12px 20px;align-items:center;justify-content:space-between}
+  @media(max-width:900px){
+    .mobile-menu{display:flex}
+    .sidebar{display:none}
+    .sidebar.open{display:block;position:fixed;top:0;left:0;height:100vh;width:260px;z-index:50}
+  }
+  .mobile-menu-btn{width:34px;height:34px;background:rgba(255,255,255,.10);border-radius:8px;display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+
+<!-- ============ PAGE 0 — LOGIN ============ -->
+<div id="page-login">
+  <div class="login-card">
+    <div class="login-brand">
+      <span class="gt">&gt;</span>
+      <div style="text-align:left">
+        <div style="color:#fff;font-size:15px;font-weight:700;letter-spacing:-.01em">Accenture Security</div>
+        <div style="color:rgba(255,255,255,.70);font-size:11px;font-weight:700;letter-spacing:.10em;text-transform:uppercase">Cyber Resilience</div>
+      </div>
+    </div>
+    <h1 class="login-title">Cyber Resilience<br/>Unified Console</h1>
+    <div class="login-taglines">
+      <div class="l">One Console</div>
+      <div class="l">Multiple Services</div>
+      <div class="l">Unified Asset Access</div>
+    </div>
+    <button class="login-btn" onclick="enterConsole()">
+      Enter Console
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+    <div class="login-footer">Accenture · Cyber Resilience Practice · Collaborative Portfolio</div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app">
+  <!-- Mobile top bar -->
+  <div class="mobile-menu">
+    <div style="display:flex;align-items:center;gap:8px"><span style="color:#a100ff;font-size:22px;font-weight:800">&gt;</span><span style="font-weight:700;font-size:14px">Cyber Resilience</span></div>
+    <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand" onclick="goToStep(1)">
+      <div class="gt-box">&gt;</div>
+      <div>
+        <div class="sb-brand-txt">Cyber Resilience</div>
+        <div class="sb-brand-sub">Unified Console</div>
+      </div>
+    </div>
+
+    <!-- Step tracker -->
+    <div class="sb-steps" id="sb-steps"></div>
+
+    <div class="sb-section">
+      <div class="sb-section-lbl">Services</div>
+      <div id="sb-services"></div>
+    </div>
+
+    <div class="sb-section" style="padding:0 6px;margin-top:6px">
+      <div class="sb-section-lbl" style="padding:0 8px">Global Platform</div>
+      <div id="sb-cyberai-item"></div>
+    </div>
+
+    <div class="sb-nav">
+      <a onclick="goToStep(1)" style="display:block;color:rgba(255,255,255,.60);padding:5px 0;cursor:pointer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</a>
+      <a onclick="resetAll()" style="display:block;color:rgba(255,255,255,.35);padding:5px 0;cursor:pointer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Reset all</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="main-content"></main>
+</div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const SERVICES = [
+  {id:"secure-code",name:"Secure the Code",desc:"SAST, SCA, Supply Chain Security and SBOM management across development pipelines.",icon:"code",status:"live",foot:"AWARE, TrustCode & SCA Guard · 16 Agents · 2 Clients · 30% Optimization"},
+  {id:"secure-sdlc",name:"Secure SDLC",desc:"DevSecOps automation and secure design reviews with STRIDE-based threat modelling.",icon:"sdlc",status:"live",foot:"ADI & AITM · 13 Agents · 2 Clients · 60% Optimization"},
+  {id:"ctem",name:"Threat Exposure Management",desc:"Continuous vulnerability scanning, DAST, attack surface management and remediation factory.",icon:"exposure",status:"live",foot:"AWARE & VMScout · 10 Agents · 2 Clients · 30% Optimization"},
+  {id:"pentest",name:"Penetration Testing",desc:"Web, API, mobile, thick client, AI/LLM, OT, infrastructure and product/platform penetration testing.",icon:"pentest",status:"live",foot:"AWARE · 16 Agents · 2 Clients · 30% Optimization | OffSecOne · 10 Agents · 30% Optimization"},
+  {id:"ai-sec",name:"AI Security",desc:"AI app architecture review, AI code repo scan, LLM pentest and AI configuration review.",icon:"ai",status:"live",foot:"AEGIS & AITM · 1 Client · 7 Agents · ~40% Optimization"},
+  {id:"cas",name:"Cyber Attack Simulation",desc:"Breach attack simulation, red teaming, threat intelligence and threat hunting.",icon:"cas",status:"live",foot:"AIAE · 3 Agents · 40% Optimization"},
+  {id:"config",name:"Configuration Reviews",desc:"Cloud, OS, infrastructure and database configuration security reviews.",icon:"config",status:"live",foot:"Cloud Inspector · 7 Agents · ~30% Optimization"},
+  {id:"cloud",name:"Cloud Security",desc:"Cloud penetration testing and cloud native application security.",icon:"cloud",status:"live",foot:"OffSecOne · 4 Agents · 30% Optimization"}
+];
+
+const OFFERINGS = {
+  "secure-code":[
+    {id:"sast",name:"Code Security (SAST)",desc:"Static application security testing",status:"live"},
+    {id:"supply-chain",name:"Supply Chain Security",desc:"Dependency & supply chain risk",status:"progress"},
+    {id:"sca",name:"Software Composition Analysis (SCA)",desc:"Open-source component analysis",status:"live"},
+    {id:"sbom",name:"SBOM",desc:"Software bill of materials",status:"progress"}
+  ],
+  "secure-sdlc":[
+    {id:"devsecops",name:"DevSecOps",desc:"CI/CD security pipeline automation",status:"live"},
+    {id:"design-review",name:"Design Reviews",desc:"Secure design & architecture review",status:"live"}
+  ],
+  "ctem":[
+    {id:"vuln-scan",name:"Vulnerability Scanning",desc:"Automated vulnerability discovery",status:"live"},
+    {id:"remediation",name:"Remediation Factory",desc:"AI-driven remediation guidance",status:"progress"},
+    {id:"dast",name:"DAST",desc:"Dynamic application security testing",status:"live"},
+    {id:"asm",name:"Attack Surface Management",desc:"External attack surface discovery",status:"live"},
+    {id:"continuous",name:"Continuous Threat Exposure Management",desc:"Ongoing exposure monitoring",status:"progress"}
+  ],
+  "pentest":[
+    {id:"web-pt",name:"Web Application PT",desc:"OWASP Top 10 / SANS methodology",status:"live"},
+    {id:"api-pt",name:"API Pen Testing",desc:"REST/GraphQL/SOAP endpoint testing",status:"live"},
+    {id:"infra-pt",name:"Infrastructure PT",desc:"Network, servers, firewalls (OSSTMM)",status:"live"},
+    {id:"mobile-pt",name:"Mobile PT",desc:"Android/iOS OWASP Mobile Top 10",status:"live"},
+    {id:"thick-pt",name:"Thick Client PT",desc:"Desktop application testing",status:"live"},
+    {id:"llm-pt",name:"AI / LLM PT",desc:"OWASP LLM Top 10 red-teaming",status:"live"},
+    {id:"ot-pt",name:"OT Penetration Testing",desc:"Operational technology security testing",status:"progress"},
+    {id:"product-pt",name:"Product / Platform PT",desc:"SaaS/PaaS end-to-end product testing",status:"live"}
+  ],
+  "ai-sec":[
+    {id:"ai-arch",name:"AI App Architecture Review / Threat Modeling",desc:"AI system architecture & STRIDE / MITRE ATLAS analysis",status:"live"},
+    {id:"ai-code",name:"AI Code Repository Scan",desc:"AI/ML code security scanning",status:"live"},
+    {id:"ai-config",name:"AI Configuration Review",desc:"AI system configuration audit",status:"live"},
+    {id:"llm-red",name:"LLM Penetration Testing",desc:"OWASP LLM Top 10 adversarial probes",status:"live"}
+  ],
+  "cas":[
+    {id:"bas",name:"Breach Attack Simulation",desc:"Automated adversary emulation",status:"live"},
+    {id:"red-team",name:"Red Teaming",desc:"Full-scope adversary simulation",status:"live"},
+    {id:"threat-intel",name:"Threat Intelligence",desc:"OSINT-driven correlated intelligence",status:"progress"},
+    {id:"threat-hunt",name:"Threat Hunting",desc:"Proactive threat discovery",status:"progress"}
+  ],
+  "config":[
+    {id:"cloud-cfg",name:"Cloud Configuration Reviews",desc:"Cloud posture & misconfig detection",status:"live"},
+    {id:"os-cfg",name:"OS Configuration Reviews",desc:"Operating system hardening review",status:"progress"},
+    {id:"infra-cfg",name:"Infra Configuration Reviews",desc:"Infrastructure baseline review",status:"progress"},
+    {id:"db-cfg",name:"Database Configuration Reviews",desc:"Database hardening & security review",status:"progress"}
+  ],
+  "cloud":[
+    {id:"cloud-pt",name:"Cloud Penetration Testing",desc:"AWS/Azure/GCP penetration testing (CSA, NIST)",status:"live"},
+    {id:"cloud-native",name:"Cloud Native Apps",desc:"Container, K8s, serverless security",status:"progress"}
+  ]
+};
+
+const TOOLS = [
+  {
+    id:"aware", recTag:"Best Value",recColor:"059669", order:1, name:"AWARE", acro:"Automated Web App Recon & Exploitation",
+    source:"accenture", status:"deployed", url:"https://aware-framework.accenture.com/",
+    desc:"AI-powered unified SaaS security platform that seamlessly automates vulnerability detection via prompt engineering, correlation, and remediation across applications and code within a single ecosystem. Covers 6 major security services: SAST, DAST, SCA, PenTest, Cloud Config Review and Infra VM.",
+    bestFor:"Large enterprises with 50+ applications needing unified SAST/DAST/SCA coverage across the full development lifecycle",
+    whyText:"Consolidates 6 security services into one platform — reducing tool sprawl, accelerating remediation, and providing a single pane of glass for application security posture",
+    pricing:"$50K-$200K depending on application count and scan depth",
+    timeline:"4-8 weeks",
+    applicability:"50+ apps · SAST/DAST/SCA · Enterprise",
+    engagementType:"One-Stop AppSec Platform",
+    matchReason:"Unified SAST+DAST+SCA+PT in single platform — replaces 6 tools",
+    painRemoved:"Stop juggling 6 standalone scanners — one unified dashboard replaces SAST + DAST + SCA + PT + Cloud Config + Infra VM tools",
+    proofPoint:"200+ vulnerabilities found across 50-app portfolio in under 3 weeks",
+    expectedOutcomes:["40% reduction in vulnerability backlog within 8 weeks","Single unified security dashboard across all applications","Automated remediation guidance reducing fix time by 67%","Compliance-ready reporting for OWASP, NIST, PCI DSS"],
+    deliverables:["Comprehensive vulnerability assessment report","Risk-ranked findings with CVSS scores","Remediation roadmap with priority matrix","Executive summary with trend analysis"],
+    services:["secure-code","pentest","ctem","cloud"],
+    offerings:["sast","sca","web-pt","api-pt","vuln-scan","dast","ai-code","cloud-pt"],
+    metrics:{Optimization:"30%",Agents:"10",Clients:"5",Coverage:"6 services"},
+    clients:["CIO","AEH","PayPal","RCM","Opella"],
+    subServices:["SAST","DAST","SCA","Web PenTest","Cloud Config Review","Infra VM","Auto Crawl","Endpoint Discovery","Vulnerability Management","AI Remediation Assistant"],
+    integrations:["Fortify","HCL AppScan","WebInspect","Burp Suite","Veracode","Black Duck","ScoutSuite"],
+    architecture:"6-layer agentic pipeline: Config → Scan Invocation → Execution → FPA → Reporting → Remediation",
+    agents:[
+      {n:"DAST Agent",d:"Perform Application Security Testing",o:"25%"},
+      {n:"SAST Agent",d:"Perform Source Code Review",o:"30%"},
+      {n:"SCA Agent",d:"Perform Software Composition Analysis",o:"30%"},
+      {n:"Auto Crawl Agent",d:"Crawl application URLs",o:"40%"},
+      {n:"Endpoint Discovery Agent",d:"Identify API Endpoints",o:"40%"},
+      {n:"Pentest Agent",d:"Perform Application Penetration Testing",o:"35%"},
+      {n:"Vuln Management Agent",d:"Perform Vulnerability Management",o:"20%"},
+      {n:"Cloud Config Review Agent",d:"Perform cloud configuration review",o:"20%"},
+      {n:"Reporting Agent",d:"Threat Intel Enriched Reporting",o:"40%"},
+      {n:"AI Remediation Assistant",d:"AI-Powered Remediation Guidance",o:"30%"}
+    ]
+  },
+  {
+    id:"adi", recTag:"DevSecOps Ready",recColor:"059669", order:6, name:"ADI", acro:"Automated DevSecOps Integrator",
+    source:"accenture", status:"deployed", url:"https://aware-framework.accenture.com/adi/",
+    desc:"ADI accelerates DevSecOps adoption through AI-driven pipeline automation, intelligent security scanning, automated false positive analysis, real-time vulnerability visibility, and AI-powered remediation assistance. LLM-based pipeline script generation for Azure DevOps, Jenkins and GitHub.",
+    bestFor:"Development teams adopting DevSecOps who need automated security pipeline generation for Azure DevOps, Jenkins, or GitHub",
+    whyText:"Generates CI/CD security pipelines with one click — embedding SAST, DAST, and SCA into existing workflows with AI-powered false positive filtering that eliminates noise",
+    pricing:"$30K-$80K for pipeline setup and ongoing optimization",
+    timeline:"2-4 weeks",
+    applicability:"CI/CD pipelines · Dev teams · Azure/Jenkins/GitHub",
+    engagementType:"DevSecOps Pipeline Automation",
+    matchReason:"Embeds security gates into existing CI/CD with AI FPA",
+    painRemoved:"Stop configuring security pipelines manually — AI generates CI/CD security gates for Azure DevOps, Jenkins, GitHub in one click",
+    proofPoint:"60% faster DevSecOps adoption with AI-powered false positive elimination",
+    expectedOutcomes:["60% acceleration in DevSecOps adoption","Automated false positive removal saving 75% triage time","Security gates embedded in every deployment pipeline","Developer-friendly remediation guidance reducing fix time"],
+    deliverables:["Configured CI/CD security pipelines","SAST/DAST/SCA scan results with FPA","Remediation walkthrough documentation","DevSecOps maturity assessment"],
+    services:["secure-sdlc"],
+    offerings:["devsecops"],
+    metrics:{Optimization:"60%",Agents:"8",Clients:"5","Scan types":"4"},
+    clients:["CBUAE","TFO","Magnum","MS Amlin","Whirlpool"],
+    subServices:["AI Pipeline Generation","SAST","DAST","SCA","Code Quality","Tool Setup Assistant","False Positive Analysis","AI Remediation Guidance","Compliance Reporting"],
+    integrations:["Azure DevOps","Jenkins","GitHub","Fortify","Veracode","Checkmarx","Semgrep","Aikido Sec"],
+    architecture:"6-layer agentic pipeline: Pipeline → Setup → Execution → FPA → Reporting → Remediation",
+    agents:[
+      {n:"Pipeline Creator Agent",d:"Builds and configures CI/CD pipelines",o:"70%"},
+      {n:"Tool Setup Assistant Agent",d:"Agent & tool installation guidance",o:"60%"},
+      {n:"SAST Runner Agent",d:"Static application security scanning",o:"40%"},
+      {n:"DAST Runner Agent",d:"Dynamic live app security scan",o:"40%"},
+      {n:"SAST Filter Agent",d:"Removes SAST false positives",o:"60%"},
+      {n:"DAST Filter Agent",d:"Removes DAST false positives",o:"60%"},
+      {n:"Remediation Guide Agent",d:"Guided step-by-step fix walkthrough",o:"60%"},
+      {n:"Report Agent",d:"Generates and delivers audit reports",o:"60%"}
+    ]
+  },
+  {
+    id:"aegis", recTag:"LLM Specialist",recColor:"DC2626", order:5, name:"AEGIS", acro:"AI Endpoint Guardrail & Inspection System",
+    source:"accenture", status:"deployed", url:"http://3.6.103.74:8080/",
+    desc:"AEGIS is an AI-powered LLM security validation platform that runs 40+ probe families (~2,000 adversarial prompts) against any GenAI endpoint. One-click scan from target to Accenture-branded evidence pack. Powered by open-source garak (NVIDIA) engine — $0 engine license cost with ~40% effort reduction vs manual AI/LLM security.",
+    bestFor:"Any organization deploying GenAI/LLM applications that needs adversarial security validation against OWASP LLM Top 10",
+    whyText:"Purpose-built for LLM security — fires 2,000+ adversarial prompts across 40+ probe families in under 4 hours with zero engine licensing cost, producing audit-ready evidence mapped to OWASP LLM Top 10",
+    pricing:"$25K-$75K per LLM endpoint assessment",
+    timeline:"1-2 weeks",
+    applicability:"LLM/GenAI apps · OWASP LLM · Audit-ready",
+    engagementType:"LLM Security Validation",
+    matchReason:"2000+ adversarial probes mapped to OWASP LLM Top 10",
+    painRemoved:"Stop manually probing LLMs for vulnerabilities — 2,000 adversarial prompts fired in under 4 hours",
+    proofPoint:"40+ probe families covering full OWASP LLM Top 10 with zero engine licensing cost",
+    expectedOutcomes:["Complete OWASP LLM Top 10 coverage in a single scan","AI-written severity ratings and remediation for every finding","40% effort reduction vs manual LLM security testing","Accenture-branded evidence pack ready for audit submission"],
+    deliverables:["LLM security assessment report","OWASP LLM Top 10 coverage matrix","Probe results with severity and remediation","Executive summary with risk posture"],
+    services:["ai-sec","pentest"],
+    offerings:["llm-red","llm-pt"],
+    metrics:{Optimization:"40%",Agents:"4","Probe families":"40+","Prompts/scan":"~2,000"},
+    clients:["CIO","AEH","CDP","APP","APP PS"],
+    subServices:["LLM Red-Teaming","Prompt Injection","Jailbreak Testing","Encoding Attacks","Data Leakage","Refusal Testing","Hallucination Tests","OWASP LLM Top 10"],
+    integrations:["garak (NVIDIA)","Ollama","OpenAI","Azure OpenAI","AWS Bedrock","Custom REST"],
+    architecture:"4-agent pipeline: Orchestrator → Probe Generator → Detector/Scorer → AI Analyst",
+    agents:[
+      {n:"Orchestrator Agent",d:"Scan lifecycle controller. Queues & runs jobs end-to-end.",o:"40%"},
+      {n:"Probe Generator Agent",d:"Fires 40+ OWASP probe families: injection, jailbreak, leakage",o:"40%"},
+      {n:"Detector / Scorer Agent",d:"60+ detectors score every response: string, semantic, refusal",o:"40%"},
+      {n:"AI Analyst Agent",d:"Writes severity, impact & remediation for each failed probe",o:"40%"}
+    ]
+  },
+  {
+    id:"aaria", recTag:"Compliance Focused",recColor:"7400B8", order:7, name:"AARIA", acro:"Automated Architecture Review & Intelligent Attack Modelling",
+    source:"accenture", status:"deployed", url:"https://aware-framework.accenture.com/aaria/",
+    desc:"AI-powered architecture security review platform. Five-agent pipeline on AWS Bedrock automates threat modelling, compliance mapping (PCI-DSS, HIPAA, DORA, ISO 27001) and security assessments. Delivers DFD generation, evidence validation and STRIDE-based threat modelling.",
+    bestFor:"Organizations in regulated industries needing formal architecture security reviews with compliance mapping (PCI-DSS, HIPAA, DORA, ISO 27001)",
+    whyText:"Automates 459 security questions with AI-powered DFD generation and STRIDE threat modelling — delivering in days what manual reviews take weeks, with full compliance traceability",
+    pricing:"$20K-$60K per architecture review",
+    timeline:"1-3 weeks",
+    applicability:"Architecture phase · Regulated industries · Compliance",
+    engagementType:"Architecture Security Review",
+    matchReason:"STRIDE threat modelling with compliance mapping in days",
+    painRemoved:"Stop doing architecture reviews in spreadsheets — AI generates DFDs, STRIDE models, and compliance maps automatically",
+    proofPoint:"459 security questions automated — delivers in days what manual reviews take weeks",
+    expectedOutcomes:["40% reduction in architecture review effort","STRIDE-based threat model with DFD diagrams","Multi-framework compliance mapping","Evidence-validated findings reducing audit risk"],
+    deliverables:["Security architecture review report","Data Flow Diagrams (DFDs)","STRIDE threat model","Compliance mapping (PCI/HIPAA/DORA/ISO)"],
+    services:["secure-sdlc","ai-sec"],
+    offerings:["design-review","ai-arch"],
+    metrics:{Optimization:"40%",Agents:"5","Master Qs":"459",Stages:"4"},
+    clients:["AEH","CBUAE","Scout Motors","TFO","Celanese"],
+    subServices:["Architecture Review","STRIDE Threat Modelling","Compliance Mapping","Evidence Validation","DFD Generation","AI Architecture Analysis"],
+    integrations:["AWS Bedrock","Claude Sonnet 4.6","Checkmarx","Fortify","WebInspect","Semgrep"],
+    architecture:"5-agent pipeline: Orchestrator → Architecture Analyzer → Validation → Threat Modelling → Report Builder",
+    agents:[
+      {n:"Orchestrator Agent",d:"Pipeline entry, state initialisation",o:"40%"},
+      {n:"Architecture Analyzer Agent",d:"DFD Vision + Spec + Narrator",o:"55%"},
+      {n:"Validation Agent",d:"Evidence check + flag gaps",o:"50%"},
+      {n:"Report Builder Agent",d:"PDF + ReportLab + Waypoint",o:"60%"},
+      {n:"Threat Modelling Agent",d:"STRIDE + diagram + boundary mapping",o:"80%"}
+    ]
+  },
+  {
+    id:"aitm", recTag:"AI Architecture",recColor:"0891B2", order:8, name:"AITM", acro:"AI Integrated Threat Modelling",
+    source:"accenture", status:"deployed",
+    desc:"AI-powered threat modelling platform for LLM-based and agentic AI systems. Architecture-specific questionnaire (22+ base + 10+ AI-generated controls) cross-checks source code and maps findings to STRIDE, OWASP LLM Top 10, MITRE ATLAS and NIST AI RMF.",
+    bestFor:"Teams building agentic AI systems who need specialized threat modelling covering STRIDE, OWASP LLM Top 10, MITRE ATLAS, and NIST AI RMF",
+    whyText:"The only threat modelling tool designed specifically for AI/LLM architectures — generates AI-specific questions, validates against source code, and maps to four major AI security frameworks simultaneously",
+    pricing:"$15K-$45K per AI system threat model",
+    timeline:"1-2 weeks",
+    applicability:"AI/ML systems · Agentic architectures · NIST AI RMF",
+    engagementType:"AI System Threat Modelling",
+    matchReason:"Only tool covering STRIDE + OWASP LLM + MITRE ATLAS + NIST AI RMF",
+    painRemoved:"Stop using generic threat models for AI systems — purpose-built for LLM and agentic architectures",
+    proofPoint:"Only tool mapping STRIDE + OWASP LLM + MITRE ATLAS + NIST AI RMF simultaneously",
+    expectedOutcomes:["AI-specific threat model covering agent architectures","Cross-framework mapping (STRIDE + OWASP LLM + MITRE ATLAS + NIST AI RMF)","Source code validation with AI-powered autofill","Human-in-the-loop DFD approval workflow"],
+    deliverables:["AI threat model report","Framework compliance matrix","DFD with threat boundaries","Control recommendations"],
+    services:["secure-sdlc","ai-sec"],
+    offerings:["design-review","ai-arch"],
+    metrics:{Optimization:"40%",Agents:"7",Layers:"5",Controls:"30+"},
+    clients:["CIO","AEH"],
+    subServices:["LLM Threat Modelling","STRIDE Analysis","OWASP LLM Top 10","MITRE ATLAS","NIST AI RMF Mapping","Human-in-the-Loop DFD Approval","AI Autofill from Source Code"],
+    integrations:["AWS Bedrock","Claude Sonnet 4.6","FastAPI","LangGraph","aiosqlite","PostgreSQL"],
+    architecture:"7-agent pipeline: Orchestrator → Ingestion → Question Builder → HITL Gate → Autofill → Validation → Report",
+    agents:[
+      {n:"Orchestrator",d:"Pipeline entry, state init",o:"25%"},
+      {n:"Ingestion Agent",d:"Architecture analysis & DFD",o:"30%"},
+      {n:"Question Builder Agent",d:"22+ base + 10+ AI questions",o:"30%"},
+      {n:"Human Gate (HITL)",d:"DFD approval checkpoint",o:"40%"},
+      {n:"Autofill Agent",d:"Code analysis & confidence scoring",o:"40%"},
+      {n:"Validation Agent",d:"Pass / Fail / Insufficient Evidence",o:"45%"},
+      {n:"Report Agent",d:"STRIDE / OWASP / MITRE map",o:"30%"}
+    ]
+  },
+  {
+    id:"offsecone", recTag:"Most Comprehensive",recColor:"D97706", order:9, name:"OffSecOne", acro:"Integrated OffSec Managed Services Platform",
+    source:"accenture", status:"progress",
+    desc:"All-in-One Security Review Console. Unified delivery across all offensive service lines — one team, one platform, from scoping to reporting. Backed by 50+ full-stack security engineers (ETA Aug 2026), proprietary OffSec Platform (ETA Dec 2026), and tool evaluation across the full offensive security stack. Integrates with XBOW for autonomous testing.",
+    bestFor:"Full-scope offensive security engagements requiring specialist testing across infrastructure, mobile, thick client, OT, and product platforms",
+    whyText:"One team, one platform, from scoping to reporting — backed by 50+ full-stack security engineers covering every offensive testing specialization that single-tool platforms cannot",
+    pricing:"$100K-$500K+ depending on scope and duration",
+    timeline:"4-12 weeks",
+    applicability:"Infra/Mobile/OT · Full-scope · Enterprise PT",
+    engagementType:"Full-Scope Offensive Security",
+    matchReason:"50+ specialists covering every PT specialization",
+    painRemoved:"Stop coordinating 5 vendors for different PT types — one team covers every specialization from scoping to reporting",
+    proofPoint:"50+ full-stack security engineers covering infra, mobile, OT, thick client, cloud, and product PT",
+    expectedOutcomes:["Full-spectrum offensive coverage across 8 PT specializations","Unified reporting from scoping through remediation verification","Integration with XBOW for autonomous + manual coverage","50+ specialist engineers for any technology stack"],
+    deliverables:["Comprehensive penetration test report","Exploit evidence documentation","Risk-ranked remediation roadmap","Retest verification results"],
+    services:["pentest","cas","cloud"],
+    offerings:["infra-pt","mobile-pt","thick-pt","ot-pt","product-pt","bas","red-team","cloud-pt"],
+    metrics:{Optimization:"30%",Agents:"10","Engineers":"50+","Launch":"Oct 2026"},
+    clients:["Internal — Cyber Resilience Practice"],
+    subServices:["Web PT","API PT","Infra PT","Mobile PT","Thick Client PT","OT PT","Product PT","Cloud PT","BAS","Red Teaming"],
+    integrations:["XBOW","Burp Suite Pro","Metasploit","Cobalt Strike","Nmap","Shodan","Custom OffSec Platform"],
+    architecture:"Unified delivery platform · Scoping → Recon → Execution → Evidence → Reporting",
+    agents:[
+      {n:"Scoping Agent",d:"Engagement scope definition and planning",o:"—"},
+      {n:"Recon Agent",d:"Automated reconnaissance & surface mapping",o:"—"},
+      {n:"Infra PT Agent",d:"Network & infra penetration testing",o:"—"},
+      {n:"Mobile PT Agent",d:"Android/iOS security testing",o:"—"},
+      {n:"Thick Client PT Agent",d:"Desktop application testing",o:"—"},
+      {n:"Product PT Agent",d:"SaaS/PaaS end-to-end testing",o:"—"},
+      {n:"Cloud PT Agent",d:"AWS/Azure/GCP penetration testing",o:"—"},
+      {n:"BAS Agent",d:"Breach & attack simulation",o:"—"},
+      {n:"Red Team Agent",d:"Full-scope adversary simulation",o:"—"},
+      {n:"Report Agent",d:"Automated PT report generation",o:"—"}
+    ]
+  },
+  {
+    id:"aiae", recTag:"Threat Intel",recColor:"DC2626", order:10, name:"AIAE", acro:"Actionable Intelligence API Enablement",
+    source:"accenture", status:"progress",
+    desc:"OSINT-driven correlated intelligence platform for external attack surface management, threat intelligence enrichment and attack surface discovery. Feeds CTEM and Cyber Attack Simulation workflows with real-time exposure data.",
+    bestFor:"Security teams needing real-time external attack surface visibility and OSINT-driven threat intelligence correlation",
+    whyText:"Aggregates OSINT sources to provide continuous external attack surface mapping with IOC and TTP correlation — feeding actionable intelligence into CTEM and BAS workflows",
+    pricing:"$40K-$120K for continuous monitoring setup",
+    timeline:"Ongoing",
+    applicability:"External ASM · Threat intel · OSINT-driven",
+    engagementType:"External Intelligence Feed",
+    matchReason:"OSINT-driven ASM and IOC/TTP correlation",
+    painRemoved:"Stop manually tracking your external attack surface — OSINT-driven continuous monitoring finds what you cannot see",
+    proofPoint:"Real-time IOC and TTP correlation across multiple threat intelligence feeds",
+    expectedOutcomes:["Continuous external attack surface visibility","IOC and TTP correlation across threat feeds","Automated exposure prioritization by business risk","Integration with remediation workflows"],
+    deliverables:["Attack surface inventory","Threat intelligence report","IOC/TTP correlation analysis","Exposure prioritization matrix"],
+    services:["ctem","cas"],
+    offerings:["asm","threat-intel"],
+    metrics:{Optimization:"40%",Agents:"3",Feeds:"OSINT","Coverage":"External ASM"},
+    clients:["Internal — Cyber Resilience Practice"],
+    subServices:["OSINT Aggregation","External ASM","Threat Intel Enrichment","IOC & TTP Correlation"],
+    integrations:["Shodan","Censys","VirusTotal","MISP","Custom OSINT Feeds"],
+    architecture:"3-agent pipeline: OSINT Collector → Correlator → Enrichment",
+    agents:[
+      {n:"OSINT Collector Agent",d:"Aggregates OSINT sources for attack surface data",o:"40%"},
+      {n:"Correlator Agent",d:"Correlates IOCs and TTPs across feeds",o:"40%"},
+      {n:"Enrichment Agent",d:"Contextualises intel with client-specific data",o:"40%"}
+    ]
+  },
+  {
+    id:"cloud-inspector", recTag:"Cloud Native",recColor:"0891B2", order:11, name:"Cloud Inspector", acro:"Cloud Configuration & Posture Review Platform",
+    source:"accenture", status:"progress",
+    desc:"Cloud-native configuration review platform covering AWS, Azure, GCP and custom cloud environments. Automated posture assessment against CIS benchmarks, misconfiguration detection and IAM analysis.",
+    bestFor:"Multi-cloud environments needing automated configuration review against CIS benchmarks across AWS, Azure, and GCP",
+    whyText:"Purpose-built for cloud configuration security — automated posture assessment, IAM analysis, and public exposure detection across all major cloud providers with CIS benchmark mapping",
+    pricing:"$25K-$80K depending on cloud account count",
+    timeline:"1-2 weeks",
+    applicability:"Multi-cloud · CIS benchmarks · Config compliance",
+    engagementType:"Multi-Cloud Posture Review",
+    matchReason:"CIS benchmark compliance across AWS, Azure, GCP",
+    painRemoved:"Stop checking cloud configs against spreadsheets — automated CIS benchmark assessment across AWS, Azure, GCP",
+    proofPoint:"400+ misconfigurations detected automatically with IAM privilege escalation path mapping",
+    expectedOutcomes:["Multi-cloud configuration drift detection","CIS benchmark compliance scoring","IAM privilege escalation path identification","Public exposure and misconfiguration remediation"],
+    deliverables:["Cloud security posture report","CIS benchmark compliance matrix","IAM analysis report","Remediation priority roadmap"],
+    services:["config"],
+    offerings:["cloud-cfg"],
+    metrics:{Optimization:"~30%",Agents:"7",Clouds:"AWS·Azure·GCP","Benchmarks":"CIS"},
+    clients:["Internal — Cyber Resilience Practice"],
+    subServices:["Cloud Config Review","CIS Benchmark Assessment","IAM Analysis","Public Exposure Check","Privilege Escalation Detection"],
+    integrations:["AWS Config","Azure Policy","GCP Security Command Center","ScoutSuite","Prowler"],
+    architecture:"7-agent modular pipeline for multi-cloud configuration assessment",
+    agents:[
+      {n:"AWS Config Agent",d:"AWS misconfiguration detection",o:"30%"},
+      {n:"Azure Config Agent",d:"Azure security posture review",o:"30%"},
+      {n:"GCP Config Agent",d:"GCP configuration assessment",o:"30%"},
+      {n:"IAM Analyzer",d:"IAM policy and role review",o:"30%"},
+      {n:"Exposure Agent",d:"Public exposure and public access detection",o:"30%"},
+      {n:"Compliance Agent",d:"CIS benchmark & compliance mapping",o:"30%"},
+      {n:"Report Agent",d:"Automated posture reporting",o:"30%"}
+    ]
+  },
+  {
+    id:"xbow", recTag:"Fastest Coverage",recColor:"D97706", order:4, name:"XBOW", acro:"Autonomous Offensive Security Platform (Strategic Partner)",
+    source:"partner", status:"deployed", url:"https://xbow.com",
+    desc:"AI-powered autonomous penetration testing platform (Accenture Ventures investee, May 2026). Autonomous agents discover, chain and exploit real vulnerabilities at machine speed with deterministic validation. Near-zero false positives, SOC2/ISO 27001/PCI DSS/NIS 2 compliant reporting. Integrated with Microsoft Security Copilot and Sentinel. Strategic partnership announced with Accenture in Slide 15 of the Cyber Resilience Portfolio Overview.",
+    bestFor:"Organizations needing continuous autonomous penetration testing with deterministic validation — especially for fast-moving environments requiring real-time coverage",
+    whyText:"Only platform that autonomously discovers, chains, and exploits real vulnerabilities at machine speed with near-zero false positives — validated by deterministic logic, not heuristics",
+    pricing:"$75K-$300K for continuous testing license depending on scope",
+    timeline:"Continuous",
+    applicability:"Web/API · Critical risk · Rapid coverage",
+    engagementType:"Autonomous Continuous Testing",
+    matchReason:"Machine-speed PT with near-zero false positives",
+    painRemoved:"Stop waiting weeks for pentest results — autonomous agents test continuously at machine speed, 24/7",
+    proofPoint:"Near-zero false positive rate — every finding is confirmed exploitable with deterministic PoC",
+    expectedOutcomes:["Near-zero false positive rate through deterministic validation","Continuous 24/7 security testing at machine speed","Multi-step exploit chain discovery human testers miss","SOC2/ISO 27001/PCI DSS/NIS2 compliant reporting"],
+    deliverables:["Continuous vulnerability assessment","Exploit chain documentation with PoC","Compliance-mapped findings report","Microsoft Sentinel/Copilot integration dashboard"],
+    services:["pentest","ctem","cas"],
+    offerings:["web-pt","api-pt","asm","continuous","bas","vuln-scan"],
+    metrics:{Funding:"$270M","MSRC":"Top rank",Validation:"Deterministic",Compliance:"SOC2·ISO·PCI·NIS2"},
+    clients:["150+ security teams globally"],
+    subServices:["Autonomous Web App PT","Continuous PT","Attack Surface Discovery","Multi-step Exploit Chain","API Security Testing","Exposure Management"],
+    integrations:["Microsoft Security Copilot","Microsoft Sentinel","AWS ISV Accelerate","Accenture Cyber.AI"],
+    architecture:"Persistent Coordinator + Parallel Exploration Agents + Deterministic Validator + Shared Execution Environment",
+    agents:[
+      {n:"Persistent Coordinator",d:"Maintains global view of environment, directs testing, prioritises attack surface",o:"—"},
+      {n:"Autonomous Exploration Agents",d:"Thousands of parallel agents explore with human-like reasoning",o:"—"},
+      {n:"Deterministic Validator",d:"Confirms exploitability with non-destructive PoC challenges",o:"—"},
+      {n:"Shared Execution Environment",d:"Industry-standard tools + steerable headless browser",o:"—"}
+    ]
+  },
+  {
+    id:"apa", recTag:"AI Co-pilot",recColor:"0891B2", order:3, name:"Agentic Pentest Assistant", acro:"AI-Powered Multi-Agent Penetration Testing Co-pilot",
+    source:"global", status:"deployed",
+    desc:"A Generative AI agentic capability designed to aid pentest analysts throughout pen testing operations — collaboratively planning and executing tasks, offering timely expert guidance, and generating reports. Four-layer multi-agent hierarchy (Strategic · Coordination · Tactical · Intelligence) with MCP-based tool integration.",
+    bestFor:"Penetration testing teams needing AI co-pilot assistance for planning, execution, and reporting — especially for complex multi-phase engagements",
+    whyText:"Reduces manual effort by 60% through AI-driven attack planning, dynamic testing advice, and automated report generation while maintaining human oversight at every step",
+    pricing:"$30K-$100K per engagement depending on scope and application count",
+    timeline:"2-6 weeks",
+    applicability:"Manual PT · AI co-pilot · Any tech stack",
+    engagementType:"AI-Assisted Pentest Co-pilot",
+    matchReason:"Cuts report time 60% while keeping human oversight",
+    painRemoved:"Stop writing pentest reports manually — AI generates findings, evidence packs, and remediation in real-time",
+    proofPoint:"60% report generation time saved per engagement with consistent methodology",
+    expectedOutcomes:["60% reduction in report generation time","50% faster vulnerability triage and classification","Consistent methodology across all pentest engagements","MCP-based tool integration with Burp Suite, ZAP, and SPLX"],
+    deliverables:["AI-assisted penetration test report","Attack path documentation","Evidence collection package","Remediation recommendations with priority"],
+    services:["pentest","cas"],
+    offerings:["web-pt","api-pt","infra-pt","mobile-pt","thick-pt","llm-pt","product-pt","bas","red-team"],
+    metrics:{"Report savings":"60%","Triage reduction":"50%","Workflow":"30%",Agents:"16+"},
+    clients:["Cyber Resilience Practice"],
+    subServices:["Attack Planning","Dynamic Advice","Tool Integration (MCP)","Report Generation","Reconnaissance","Vulnerability Identification","Testing","Evidence Collection"],
+    integrations:["Burp Suite Pro","ZAP","SPLX","Cisco AI Validation","Kali","MCP Protocol","MongoDB","ElasticSearch"],
+    architecture:"4-layer hierarchy: Strategic → Coordination → Tactical → Intelligence · SaaS or On-Premises",
+    agents:[
+      {n:"Strategy Agent",d:"Engagement planning, phase transitions",o:"—"},
+      {n:"Prerequisite Agent",d:"Auth & credential analysis",o:"—"},
+      {n:"Conversation Agent",d:"User interaction & clarification",o:"—"},
+      {n:"Reporting Agent",d:"Finding synthesis & report generation",o:"60%"},
+      {n:"Coordination Engine",d:"Task queue, retry logic orchestration",o:"—"},
+      {n:"Phase Evaluator",d:"10 tools, 4-layer validation",o:"—"},
+      {n:"Rapid Triage Manager",d:"Fast-path exploit detection",o:"50%"},
+      {n:"Inter-Iteration Planner",d:"Artifact auditing between iterations",o:"—"},
+      {n:"Recon Agent",d:"Discovery, mapping, tech identification",o:"—"},
+      {n:"Vuln Agent",d:"Systematic testing, evidence-gated",o:"—"},
+      {n:"Specialist Agents (10+)",d:"SQLi, XSS, SSTI, SSRF, JWT, BOLA",o:"—"},
+      {n:"Validation Agent",d:"Finding correlation & validation",o:"—"},
+      {n:"Finding Intelligence",d:"Coverage matrix, attack chains",o:"—"},
+      {n:"Curl Intelligence",d:"SSTI/CSRF detect, response dedup",o:"—"},
+      {n:"Payload Adaptation",d:"Per-target payload optimization",o:"—"},
+      {n:"Project Memory",d:"3-tier memory: short/mid/long-term",o:"—"}
+    ]
+  },
+  {
+    id:"cyberai", recTag:"Strategic Advisory",recColor:"7400B8", order:2, name:"Cyber.AI Platform", acro:"AI-Powered Consulting Intelligence & Advisory Orchestrator", url:"https://cyberai.accenture.com/login",
+    source:"global", status:"deployed",
+    desc:"Accenture's AI-powered cybersecurity intelligence layer — 24 specialized agents orchestrated across 15+ structured missions covering all Cyber Resilience services. Provides preflight-gated, anti-hallucination advisory for strategic program design, risk assessment, and cross-service intelligence.",
+    bestFor:"Strategic engagements requiring cross-service intelligence, program design, and risk-driven advisory across the full Cyber Resilience portfolio",
+    whyText:"The intelligence brain behind every recommendation — 24 specialized AI agents provide strategic advisory, compliance guidance, and cross-service insights that make operational tools smarter",
+    pricing:"Included with Cyber Resilience engagements — no separate licensing",
+    timeline:"Ongoing",
+    applicability:"All engagements · Strategic advisory · Cross-service",
+    engagementType:"Advisory Intelligence Layer",
+    matchReason:"AI advisory across all services — strategic program design",
+    painRemoved:"Stop designing engagements from scratch — AI advisory designs the optimal approach in minutes, not days",
+    proofPoint:"50% reduction in engagement scoping time across Cyber Resilience practice",
+    expectedOutcomes:["AI-driven engagement scoping reducing planning time by 50%","Cross-service risk correlation identifying hidden exposure","Compliance framework mapping across all active services","Strategic advisory for program design and roadmap"],
+    deliverables:["Strategic risk assessment","Cross-service intelligence report","Compliance gap analysis","Program design recommendations"],
+    services:["secure-code","secure-sdlc","ctem","pentest","ai-sec","cas","config","cloud"],
+    offerings:["sast","sca","devsecops","design-review","vuln-scan","dast","asm","web-pt","api-pt","infra-pt","llm-pt","ai-arch","ai-code","ai-config","llm-red","bas","red-team","threat-intel","cloud-cfg","cloud-pt"],
+    metrics:{"Missions":"15+",Agents:"24",Domains:"8",Services:"32"},
+    clients:["Cyber Resilience Practice-wide"],
+    subServices:["Strategic Advisory","Mission Orchestration","Compliance Guidance","Risk Assessment","Cross-service Intelligence","Deep-Dive Workbench"],
+    integrations:["72 tool integrations","Anti-hallucination preflight","Deep-Dive Workbench","Null-over-fiction gate"],
+    architecture:"Brain + Agent Hub + Knowledge Engine & Ontology",
+    agents:[
+      {n:"vuln_commander",d:"Vulnerability response & prioritisation",o:"—"},
+      {n:"appsec_advisor",d:"Application security program design",o:"—"},
+      {n:"offensive_security_advisor",d:"Strategic offensive security guidance",o:"—"},
+      {n:"threat_intel_strategist",d:"Threat intelligence program strategy",o:"—"},
+      {n:"ai_security_advisor",d:"AI security governance & assessment",o:"—"},
+      {n:"grc_advisor",d:"Governance, risk & compliance advisory",o:"—"},
+      {n:"cloud_security_architect",d:"Cloud security posture & architecture",o:"—"},
+      {n:"soc_strategist",d:"SOC design & optimisation",o:"—"},
+      {n:"incident_response_advisor",d:"Crisis & incident response advisory",o:"—"},
+      {n:"partner_advisor",d:"Partner & vendor assessment",o:"—"}
+    ]
+  }
+];
+
+/* Cyber.AI Mission Mapping — from CRM Coverage in Cyber.AI deck Slide 11 */
+const CYBERAI = {
+  platform:{
+    name:"Cyber.AI Platform",
+    tagline:"AI-Powered · Mission-Driven · Always-On",
+    stats:{services:32,agents:24,domains:8,missions:"15+"},
+    desc:"Accenture's AI-powered cybersecurity intelligence layer — 24 specialized agents orchestrated across 15+ structured missions. Not a replacement for operational tools, but the advisory brain that designs the optimal approach for every engagement."
+  },
+  missions:{
+    "secure-code":{
+      missions:[
+        {name:"AppSec Program",agents:["vuln_commander","appsec_advisor"]},
+        {name:"Supply Chain Risk Assessment",agents:["grc_advisor","supply_chain_risk_manager"]}
+      ],
+      stats:{services:4,missions:2,agents:4},
+      keyOutcomes:["Shift-left security embedded in CI/CD","Reduced mean time to detect code vulnerabilities","Full open-source dependency visibility & SBOM compliance"]
+    },
+    "ctem":{
+      missions:[
+        {name:"Vulnerability Response",agents:["vuln_commander","soc_triage_risk_advisor"]},
+        {name:"Vulnerability Remediation Orchestration",agents:["vuln_commander","vulnerability_remediation_orchestrator"]}
+      ],
+      stats:{services:4,missions:2,agents:3},
+      keyOutcomes:["Continuous real-time exposure visibility","Risk-prioritized remediation reduces critical exposure time","SLA-driven remediation with measurable MTTR improvement"]
+    },
+    "secure-sdlc":{
+      missions:[
+        {name:"AppSec Program",agents:["vuln_commander","appsec_advisor"]},
+        {name:"Security Architecture Review",agents:["partner_advisor","iga_architect","soc_strategist","grc_advisor","security_rationalist"]}
+      ],
+      stats:{services:2,missions:2,agents:6},
+      keyOutcomes:["Security embedded at every SDLC stage","Automated policy enforcement in CI/CD","Architecture flaws identified before production"]
+    },
+    "pentest":{
+      missions:[
+        {name:"Offensive Security Program",agents:["threat_intel_strategist","offensive_security_advisor"]},
+        {name:"Agentic AI Security Program",agents:["security_rationalist","ai_security_advisor","agentic_identity_architect","llm_runtime_advisor"]},
+        {name:"OT Security Assessment",agents:["partner_advisor","vuln_commander","ot_security_advisor"]}
+      ],
+      stats:{services:8,missions:3,agents:9},
+      keyOutcomes:["Full-spectrum offensive coverage — web, mobile, cloud, AI & OT","Specialist AI/LLM testing against emerging threats","Actionable remediation roadmap with risk-ranked findings"]
+    },
+    "cas":{
+      missions:[
+        {name:"Crisis Simulation",agents:["incident_response_advisor","threat_intel_strategist","offensive_security_advisor"]},
+        {name:"Threat Intel Program",agents:["soc_strategist","threat_intel_strategist","soc_triage_risk_advisor"]},
+        {name:"Offensive Security Program",agents:["threat_intel_strategist","offensive_security_advisor"]}
+      ],
+      stats:{services:4,missions:3,agents:5},
+      keyOutcomes:["Security control gaps exposed before attackers find them","MITRE ATT&CK coverage continuously improved","Threat hunting reduces attacker dwell time to near-zero"]
+    },
+    "ai-sec":{
+      missions:[
+        {name:"Agentic AI Security Program",agents:["security_rationalist","ai_security_advisor","agentic_identity_architect","a2a_protocol_advisor","llm_runtime_advisor","agentic_ai_program_strategist"]},
+        {name:"AI Security Governance",agents:["grc_advisor","ai_security_advisor"]}
+      ],
+      stats:{services:4,missions:2,agents:7},
+      keyOutcomes:["AI-native threat models for every architecture","LLM attack surface continuously assessed & hardened","AI governance embedded in compliance frameworks"]
+    },
+    "config":{
+      missions:[
+        {name:"Cloud Security Assessment",agents:["partner_advisor","cloud_security_architect","cloud_security_triage_analyst"]},
+        {name:"Resilience Assessment",agents:["partner_advisor","grc_advisor","cloud_security_architect","incident_response_advisor"]},
+        {name:"Oracle DB Assessment",agents:["nist_assessment_advisor","grc_advisor"]}
+      ],
+      stats:{services:4,missions:3,agents:5},
+      keyOutcomes:["Multi-cloud config drift detected continuously","CIS benchmark compliance enforced at scale","Database hardening validated against industry standards"]
+    },
+    "cloud":{
+      missions:[
+        {name:"Offensive Security Program",agents:["threat_intel_strategist","offensive_security_advisor"]},
+        {name:"Cloud Security Assessment",agents:["partner_advisor","cloud_security_architect","cloud_security_triage_analyst"]},
+        {name:"Resilience Assessment",agents:["partner_advisor","soc_strategist","grc_advisor","cloud_security_architect","incident_response_advisor","cloud_security_triage_analyst"]}
+      ],
+      stats:{services:4,missions:3,agents:6},
+      keyOutcomes:["Multi-cloud attack surface continuously tested","Container & K8s environments hardened end-to-end","Cloud compliance posture assessed against major frameworks"]
+    }
+  }
+};
+
+
+/* Icons */
+const ICONS = {
+  code:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+  sdlc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg>',
+  exposure:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  pentest:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
+  ai:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>',
+  cas:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  cloud:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>',
+  config:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>',
+  identity:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  intel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>'
+};
+
+/* ============================================================
+   STATE + ROUTER
+   ============================================================ */
+let currentStep = 1;
+let selectedServices = new Set();
+let selectedOfferings = new Set();
+let currentToolId = null;
+let filterSvc = new Set();
+let filterOff = new Set();
+
+function enterConsole(){
+  document.getElementById('page-login').style.display = 'none';
+  document.getElementById('app').classList.add('on');
+  goToStep(1);
+}
+
+function goToStep(step, toolId){
+  currentStep = step;
+  if(toolId) currentToolId = toolId;
+  if(step <= 2){ filterSvc.clear(); filterOff.clear(); }
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.querySelector('.sidebar')?.classList.remove('open');
+}
+
+function resetAll(){
+  selectedServices.clear();
+  selectedOfferings.clear();
+  filterSvc.clear();
+  filterOff.clear();
+  currentToolId = null;
+  goToStep(1);
+}
+
+/* ============================================================
+   RENDERERS
+   ============================================================ */
+function renderSidebar(){
+  /* Step tracker */
+  const stepsEl = document.getElementById('sb-steps');
+  if(stepsEl){
+    const steps = [{n:1,l:"Service"},{n:2,l:"Offering"},{n:3,l:"Tools"},{n:4,l:"Details"}];
+    stepsEl.innerHTML = steps.map((s,i)=>{
+      const cls = currentStep===s.n ? 'active' : (currentStep>s.n ? 'done' : '');
+      const line = i<steps.length-1 ? `<div class="sb-step-line ${currentStep>s.n?'done':''}"></div>` : '';
+      return `<div class="sb-step ${cls}"><div class="dot">${cls==='done'?'✓':s.n}</div><div class="lbl">${s.l}</div></div>${line}`;
+    }).join('');
+  }
+
+  /* Services */
+  const el = document.getElementById('sb-services');
+  el.innerHTML = SERVICES.map(s=>{
+    const isOn = selectedServices.has(s.id);
+    const isDev = s.status === 'dev';
+    return `<div class="sb-item ${isOn?'on':''} ${isDev?'dev':''}" onclick="${isDev?'':'toggleServiceFromSidebar(\''+s.id+'\')'}">
+      <span>${s.name}</span>
+      ${isDev?`<span class="dev-tag">SOON</span>`:''}
+    </div>`;
+  }).join('');
+
+  /* Cyber.AI — same style as service items */
+  const aiEl = document.getElementById('sb-cyberai-item');
+  if(aiEl){
+    const isOn = currentToolId === 'cyberai' && currentStep === 4;
+    aiEl.innerHTML = `<div class="sb-item ${isOn?'on':''}" onclick="goToStep(4,'cyberai')">
+      <span>Cyber.AI Platform</span>
+    </div>`;
+  }
+}
+
+function toggleServiceFromSidebar(id){
+  if(selectedServices.has(id)) selectedServices.delete(id);
+  else selectedServices.add(id);
+  selectedOfferings.clear();
+  filterSvc.clear();
+  filterOff.clear();
+  if(currentStep === 4) goToStep(3);
+  else render();
+}
+
+function renderBreadcrumb(){
+  const steps = [
+    {n:1,l:"Select Service"},
+    {n:2,l:"Select Offering"},
+    {n:3,l:"Matching Tools"},
+    {n:4,l:"Tool Details"}
+  ];
+  return `<div class="breadcrumb">
+    ${steps.map((s,i)=>{
+      const cls = currentStep===s.n ? 'active' : (currentStep>s.n ? 'done' : '');
+      const clickable = currentStep>s.n;
+      return `<span class="b-step ${cls}" ${clickable?`onclick="goToStep(${s.n})" style="cursor:pointer"`:''}>${s.l}</span>${i<steps.length-1?'<span class="b-arrow">»</span>':''}`;
+    }).join('')}
+  </div>`;
+}
+
+function renderSelStrip(){
+  if(currentStep === 1) return '';
+  const svcNames = [...selectedServices].map(id=>SERVICES.find(s=>s.id===id)?.name).filter(Boolean);
+  const offNames = [];
+  selectedServices.forEach(sid=>{
+    (OFFERINGS[sid]||[]).forEach(o=>{
+      if(selectedOfferings.has(o.id)) offNames.push(o.name);
+    });
+  });
+  return `<div class="sel-strip">
+    <span class="sl">Selected:</span>
+    ${svcNames.map(n=>`<span class="sc">${n}</span>`).join('')}
+    ${offNames.map(n=>`<span class="sc sc-off">${n}</span>`).join('')}
+    <span class="change" onclick="goToStep(1)">Change selection</span>
+  </div>`;
+}
+
+/* PAGE 1 — Service Selection */
+function renderStep1(){
+  const main = document.getElementById('main-content');
+  main.innerHTML = `
+    ${renderBreadcrumb()}
+    <div class="page-head" style="margin-top:18px">
+      <h1 class="page-title">Select a service</h1>
+      <p class="page-sub">Pick one or more Cyber Resilience services you want to explore. You can combine services for a unified engagement view.</p>
+    </div>
+    <div class="card-grid" id="svc-grid"></div>
+    <div class="step-footer">
+      <div></div>
+      <div class="step-footer-hint" id="hint">Select at least one service to continue</div>
+      <button class="step-next" id="next-btn" disabled onclick="goToStep(2)">
+        View Offerings
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  `;
+
+  const grid = document.getElementById('svc-grid');
+  grid.innerHTML = SERVICES.map(s=>{
+    const isOn = selectedServices.has(s.id);
+    const isDev = s.status === 'dev';
+    const toolCount = TOOLS.filter(t=>t.services.includes(s.id)).length;
+    const offCount = (OFFERINGS[s.id]||[]).length;
+    return `<div class="sel-card ${isOn?'on':''} ${isDev?'dev':''}" data-id="${s.id}">
+      ${isDev?`<span class="dev-badge">Coming Soon</span>`:''}
+      <div class="sel-card-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="sel-card-icon">${ICONS[s.icon]||''}</div>
+      <div class="sel-card-name">${s.name}</div>
+      <div class="sel-card-desc">${s.desc}</div>
+      <div class="sel-card-meta">
+        ${isDev?`<span class="m" style="color:var(--amber);font-weight:700">Under Development</span>`:``}
+      </div>
+    </div>`;
+  }).join('');
+
+  [...grid.querySelectorAll('.sel-card:not(.dev)')].forEach(card=>{
+    card.addEventListener('click',()=>{
+      const id = card.dataset.id;
+      if(selectedServices.has(id)) selectedServices.delete(id);
+      else selectedServices.add(id);
+      selectedOfferings.clear();
+      renderStep1();
+      renderSidebar();
+    });
+  });
+
+  const btn = document.getElementById('next-btn');
+  const hint = document.getElementById('hint');
+  if(selectedServices.size > 0){
+    btn.disabled = false;
+    hint.textContent = `${selectedServices.size} service${selectedServices.size>1?'s':''} selected`;
+  }
+}
+
+/* PAGE 2 — Offering Selection */
+function renderStep2(){
+  const main = document.getElementById('main-content');
+  const svcNames = [...selectedServices].map(id=>SERVICES.find(s=>s.id===id)?.name).filter(Boolean).join(', ');
+
+  main.innerHTML = `
+    ${renderBreadcrumb()}
+    ${renderSelStrip()}
+    <div class="page-head">
+      <h1 class="page-title">Select an offering</h1>
+      <p class="page-sub">Choose the specific offerings within <b>${svcNames}</b> that match your engagement scope. Multi-select is supported. Leave all unselected to see every tool that covers your services.</p>
+    </div>
+    <div id="off-groups"></div>
+    <div class="step-footer">
+      <button class="step-back" onclick="goToStep(1)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back
+      </button>
+      <div class="step-footer-hint" id="hint">Optional — ${selectedOfferings.size} offering${selectedOfferings.size===1?'':'s'} selected</div>
+      <button class="step-next" onclick="goToStep(3)">
+        View Matching Tools
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  `;
+
+  const groupsEl = document.getElementById('off-groups');
+  const html = [...selectedServices].map(sid=>{
+    const svc = SERVICES.find(s=>s.id===sid);
+    const offs = OFFERINGS[sid] || [];
+    if(offs.length === 0) return `<div style="margin-bottom:22px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">${svc.name}</div>
+      <div class="empty" style="padding:30px"><div class="t">Offering mapping in progress</div><div class="s">Our team is actively building this out — check back soon.</div></div>
+    </div>`;
+    return `<div style="margin-bottom:22px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">${svc.name}</div>
+      <div class="card-grid">
+        ${offs.map(o=>{
+          const isOn = selectedOfferings.has(o.id);
+          const isProgress = o.status === 'progress';
+          const statusBadge = isProgress
+            ? `<span style="position:absolute;top:12px;left:12px;font-size:9px;font-weight:700;background:#fff7ed;color:#c2410c;padding:3px 8px;border-radius:999px;letter-spacing:.04em">In Progress</span>`
+            : '';
+          return `<div class="sel-card ${isOn?'on':''}" data-off="${o.id}" style="min-height:120px;padding-top:${isProgress?'34px':'20px'}">
+            ${statusBadge}
+            <div class="sel-card-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="sel-card-name" style="font-size:14px;padding-right:32px">${o.name}</div>
+            <div class="sel-card-desc" style="font-size:12px">${o.desc}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  groupsEl.innerHTML = html;
+
+  [...groupsEl.querySelectorAll('.sel-card')].forEach(card=>{
+    card.addEventListener('click',()=>{
+      const id = card.dataset.off;
+      if(selectedOfferings.has(id)) selectedOfferings.delete(id);
+      else selectedOfferings.add(id);
+      renderStep2();
+    });
+  });
+}
+
+/* PAGE 3 — Matching Tools */
+/*
+  FIT SCORE LOGIC — transparent, auditable calculation
+  Score = weighted average of:
+    60% — Service coverage (how many selected services does this tool cover?)
+    40% — Offering coverage (how many selected offerings does this tool cover?)
+  If no offerings selected, 100% weight on service coverage.
+  Displayed as percentage so leads can see exactly why a tool scored high/low.
+*/
+function calcFitScore(tool) {
+  const selSvcs = [...selectedServices];
+  const selOffs = [...selectedOfferings];
+
+  // Service match: % of user's selected services this tool covers
+  const svcMatch = selSvcs.length > 0
+    ? selSvcs.filter(s => tool.services.includes(s)).length / selSvcs.length
+    : 0;
+
+  // Offering match
+  let offMatch = 0;
+  if (selOffs.length > 0) {
+    offMatch = selOffs.filter(o => tool.offerings.includes(o)).length / selOffs.length;
+  } else {
+    // When no offerings selected, use offering breadth within selected services
+    // Tool that covers MORE offerings within selected services scores higher
+    let totalOffs = 0, coveredOffs = 0;
+    selSvcs.forEach(sid => {
+      const svcOffs = OFFERINGS[sid] || [];
+      totalOffs += svcOffs.length;
+      coveredOffs += svcOffs.filter(o => tool.offerings.includes(o.id)).length;
+    });
+    offMatch = totalOffs > 0 ? coveredOffs / totalOffs : 0;
+  }
+
+  // Weighted score
+  let score;
+  if (selOffs.length > 0) {
+    score = (svcMatch * 0.6) + (offMatch * 0.4);
+  } else {
+    score = (svcMatch * 0.5) + (offMatch * 0.5);
+  }
+
+  return Math.round(score * 100);
+}
+
+function renderStep3(){
+  const main = document.getElementById('main-content');
+
+  /* Collect all selected service names + offering names for filters */
+  const selSvcList = [...selectedServices].map(id=>SERVICES.find(s=>s.id===id)).filter(Boolean);
+  const selOffList = [];
+  selectedServices.forEach(sid=>{
+    (OFFERINGS[sid]||[]).forEach(o=>{
+      if(selectedOfferings.size===0 || selectedOfferings.has(o.id)){
+        if(!selOffList.find(x=>x.id===o.id)) selOffList.push(o);
+      }
+    });
+  });
+
+  /* Filter tools */
+  const list = TOOLS.filter(t=>{
+    /* Must cover at least one selected service */
+    if(!t.services.some(s=>selectedServices.has(s))) return false;
+    /* If offerings selected from step 2, must cover at least one */
+    if(selectedOfferings.size > 0){
+      if(!t.offerings.some(o=>selectedOfferings.has(o))) return false;
+    }
+    /* Page 3 sub-filter: by service */
+    if(filterSvc.size > 0){
+      if(!t.services.some(s=>filterSvc.has(s))) return false;
+    }
+    /* Page 3 sub-filter: by offering */
+    if(filterOff.size > 0){
+      if(!t.offerings.some(o=>filterOff.has(o))) return false;
+    }
+    return true;
+  });
+
+  const hasFilters = filterSvc.size > 0 || filterOff.size > 0;
+
+  main.innerHTML = `
+    ${renderBreadcrumb()}
+    ${renderSelStrip()}
+    <div class="page-head">
+      <h1 class="page-title" style="font-size:20px">Matching tools</h1>
+      <p class="page-sub">Tools below match your selected services${selectedOfferings.size>0?' and offerings':''}. Click any tool for full details.</p>
+    </div>
+
+    <div id="tool-list"></div>
+    <div class="step-footer">
+      <button class="step-back" onclick="goToStep(2)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Offerings
+      </button>
+      <div style="flex:1"></div>
+      <button class="step-back" onclick="resetAll()">Start over</button>
+    </div>
+  `;
+
+  /* Render tool cards */
+  const listEl = document.getElementById('tool-list');
+  if(list.length === 0){
+    listEl.innerHTML = `<div class="empty">
+      <div class="ic" style="opacity:.4;color:var(--muted)"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+      <div class="t">We are working on this</div>
+      <div class="s">Tool mapping for this combination is in progress. Try selecting a different service or offering.</div>
+    </div>`;
+    return;
+  }
+
+  listEl.innerHTML = `<div class="tool-grid">${list.sort((a,b)=>{
+    const scoreA = calcFitScore(a), scoreB = calcFitScore(b);
+    if(scoreB !== scoreA) return scoreB - scoreA;
+    return (a.order||99) - (b.order||99);
+  }).map(t=>{
+    /* Services this tool covers that the user selected */
+    const coveredSvcs = t.services
+      .filter(s=>selectedServices.has(s))
+      .map(s=>SERVICES.find(x=>x.id===s)).filter(Boolean);
+
+    /* Offerings this tool covers that are relevant */
+    const relevantOffIds = new Set();
+    selectedServices.forEach(sid=>{
+      (OFFERINGS[sid]||[]).forEach(o=>{
+        if(selectedOfferings.size===0 || selectedOfferings.has(o.id)){
+          if(t.offerings.includes(o.id)) relevantOffIds.add(o.id);
+        }
+      });
+    });
+    const coveredOffs = [...relevantOffIds].map(oid=>{
+      let found = null;
+      Object.values(OFFERINGS).forEach(arr=>{
+        const m = arr.find(o=>o.id===oid);
+        if(m) found = m;
+      });
+      return found;
+    }).filter(Boolean);
+
+    const sourceLbl = {accenture:'CYBER RESILIENCE ASSET',partner:'STRATEGIC PARTNER',global:'GLOBAL TEAM'}[t.source];
+
+    const fitScore = calcFitScore(t);
+
+    return `<div class="tool-card" onclick="goToStep(4,'${t.id}')">
+      <!-- Header -->
+      <div class="tool-card-head">
+        <div>
+          <h3 class="tool-card-name">${t.name}</h3>
+          <span class="tool-card-acro">${t.acro}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <span class="tool-source ${t.source}">${sourceLbl}</span>
+          <span style="font-size:10px;font-weight:700;background:${fitScore>=80?'#ecfdf5':fitScore>=50?'#fffbeb':'var(--chip)'};color:${fitScore>=80?'var(--green)':fitScore>=50?'var(--amber)':'var(--muted)'};padding:3px 9px;border-radius:999px;border:1px solid ${fitScore>=80?'#a7f3d0':fitScore>=50?'#fde68a':'var(--line)'}">${fitScore}% match</span>
+          ${t.recTag?`<span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;color:#fff;background:#${t.recColor||'7400B8'}">${t.recTag}</span>`:''}
+        </div>
+      </div>
+
+      <!-- Engagement Type -->
+      ${t.engagementType?`<div class="tc-box dark"><div class="tc-lbl">Engagement Type</div><div class="tc-val">${t.engagementType}</div></div>`:''}
+
+      <!-- What Pain This Removes (Aikido pattern: lead with the problem you eliminate) -->
+      ${t.painRemoved?`<div class="tc-box" style="border-left:3px solid var(--green);background:linear-gradient(135deg,#f0fdf4,#fafafa)"><div class="tc-lbl" style="color:var(--green)">What This Solves</div><div class="tc-val" style="font-size:12px;font-weight:500;color:var(--ink);line-height:1.45">${t.painRemoved}</div></div>`:''}
+
+      <!-- Proof Point (Aikido/Pentera pattern: concrete metric) -->
+      ${t.proofPoint?`<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:var(--chip);border-radius:8px;margin-bottom:8px;font-size:11.5px;color:var(--ink2);line-height:1.4"><span style="color:var(--green);font-weight:800;flex-shrink:0;font-size:13px">&#10003;</span><span>${t.proofPoint}</span></div>`:''}
+
+      <!-- How It Matches -->
+      ${t.matchReason?`<div class="tc-box purple"><div class="tc-lbl">How It Matches Your Need</div><div class="tc-val">${t.matchReason}</div></div>`:''}
+
+      <!-- Timeline + Best For -->
+      <div class="tc-row">
+        <div class="tc-cell"><div class="tc-lbl">Timeline</div><div class="tc-val">${t.timeline||'—'}</div></div>
+        <div class="tc-cell"><div class="tc-lbl">Best For</div><div class="tc-val" style="font-size:11px;font-weight:500">${t.applicability||'—'}</div></div>
+      </div>
+
+      <!-- Services + Offerings -->
+      <div class="tool-card-supports">
+        <div class="lbl">Services Covered</div>
+        ${coveredSvcs.map(s=>`<div class="item">${s.name}</div>`).join('')}
+      </div>
+      ${coveredOffs.length > 0 ? `
+      <div class="tool-card-supports" style="background:var(--teal-bg)">
+        <div class="lbl" style="color:var(--teal)">Offerings Covered</div>
+        ${coveredOffs.map(o=>`<div class="item" style="color:var(--teal)">${o.name}</div>`).join('')}
+      </div>` : ''}
+
+      <!-- Pricing + Outcomes -->
+      <div class="tc-row">
+        <div class="tc-cell" style="background:var(--green-bg)"><div class="tc-lbl" style="color:var(--green)">ROM Pricing</div><div class="tc-val" style="font-size:11px;color:#065f46">${t.pricing?t.pricing.slice(0,40)+(t.pricing.length>40?'…':''):'Contact us'}</div></div>
+        <div class="tc-cell"><div class="tc-lbl">Expected Outcomes</div><div class="tc-val">${t.expectedOutcomes?t.expectedOutcomes.length+' outcomes':'—'}</div></div>
+      </div>
+
+      <!-- CTA -->
+      <button class="tool-card-cta" style="margin-top:auto">
+        View Details & Business Case
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* PAGE 4 — Tool Detail */
+function renderStep4(){
+  const main = document.getElementById('main-content');
+  const t = TOOLS.find(x=>x.id===currentToolId);
+  if(!t){ goToStep(3); return; }
+
+  const sourceLbl = {accenture:'CYBER RESILIENCE ASSET',partner:'STRATEGIC PARTNER',global:'GLOBAL TEAM'}[t.source];
+  const allSvcNames = t.services.map(s=>SERVICES.find(x=>x.id===s)?.name).filter(Boolean);
+  const allOfferingNames = [];
+  t.services.forEach(sid=>{
+    (OFFERINGS[sid]||[]).forEach(o=>{
+      if(t.offerings.includes(o.id)) allOfferingNames.push(o.name);
+    });
+  });
+  const uniqOfferings = [...new Set(allOfferingNames)];
+
+  const launchBtn = t.url
+    ? `<a class="dt-btn primary" href="${t.url}" target="_blank" rel="noopener noreferrer">
+        Launch Tool
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7M7 7h10v10"/></svg>
+      </a>`
+    : `<span class="dt-btn primary" style="opacity:.6;cursor:not-allowed">Launch URL not yet available</span>`;
+
+  main.innerHTML = `
+    ${renderBreadcrumb()}
+    ${renderSelStrip()}
+
+    <div class="detail-hero">
+      <div class="badge-row">
+        <span class="b">${sourceLbl}</span>
+        <span class="b dep">● Deployed</span>
+      </div>
+      <h1 class="dt-name">${t.name}</h1>
+      <div class="dt-acro">${t.acro}</div>
+      <p class="dt-desc">${t.desc}</p>
+      <div class="dt-actions">
+        ${launchBtn}
+        <button class="dt-btn ghost" onclick="goToStep(3)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to tools
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-panel">
+        <h3>Key Metrics</h3>
+        <div class="dp-metrics">
+          ${Object.entries(t.metrics).map(([k,v])=>`
+            <div class="dp-metric"><div class="v">${v}</div><div class="l">${k}</div></div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="detail-panel">
+        <div class="lbl">Owner</div>
+        <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:14px">Accenture Cyber Resilience Practice</div>
+        ${t.clients && t.clients.length ? `
+          <div class="lbl">Clients / Deployments</div>
+          <div class="dp-pills" style="margin-bottom:14px">
+            ${t.clients.map(c=>`<span class="dp-pill">${c}</span>`).join('')}
+          </div>
+        `:''}
+        ${t.architecture ? `
+          <div class="lbl">Architecture</div>
+          <div style="font-size:12.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">${t.architecture}</div>
+        `:''}
+        <div class="lbl">Documentation</div>
+        <div style="font-size:12.5px;color:var(--muted)">Available on internal portal · Contact Cyber Resilience team for access</div>
+      </div>
+    </div>
+
+    ${t.whyText||t.bestFor||t.pricing?`
+    <div style="background:linear-gradient(135deg,#f3e7ff,#fdfaff);border:1.5px solid var(--brand-3);border-radius:14px;padding:20px 22px;margin-bottom:16px">
+      ${t.whyText?`<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--brand-2);margin-bottom:6px">Why This Tool</div><div style="font-size:13.5px;color:var(--ink);line-height:1.6">${t.whyText}</div></div>`:''}
+      ${t.bestFor?`<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--brand-2);margin-bottom:6px">Best For</div><div style="font-size:13px;color:var(--muted);line-height:1.55">${t.bestFor}</div></div>`:''}
+      ${t.pricing?`<div><div style="font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--green);margin-bottom:6px">ROM Pricing</div><div style="font-size:14px;color:var(--ink);font-weight:600">${t.pricing}</div></div>`:''}
+    </div>`:``}
+
+    ${t.expectedOutcomes?`
+    <div class="detail-panel" style="margin-bottom:16px;border-left:3px solid var(--green)">
+      <h3>Expected Outcomes</h3>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${t.expectedOutcomes.map(o=>`<div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink2)"><span style="color:var(--green);font-weight:700;flex-shrink:0;display:flex;align-items:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>${o}</div>`).join('')}
+      </div>
+    </div>`:``}
+
+    ${t.deliverables?`
+    <div class="detail-panel" style="margin-bottom:16px;border-left:3px solid var(--brand)">
+      <h3>What You Will Receive</h3>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${t.deliverables.map(d=>`<div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink2)"><span style="color:var(--brand);display:flex;align-items:center;color:var(--brand);flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>${d}</div>`).join('')}
+      </div>
+    </div>`:``}
+
+    <div class="detail-panel" style="margin-bottom:16px">
+      <div class="lbl">Supported Services</div>
+      <div class="dp-pills" style="margin-bottom:16px">
+        ${allSvcNames.map(n=>`<span class="dp-pill brand">${n}</span>`).join('')}
+      </div>
+      <div class="lbl">Supported Offerings</div>
+      <div class="dp-pills">
+        ${uniqOfferings.map(n=>`<span class="dp-pill">${n}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="detail-panel" style="margin-bottom:16px">
+      <h3>Sub-services (${t.subServices.length})</h3>
+      <div class="dp-pills">
+        ${t.subServices.map(s=>`<span class="dp-pill">${s}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="detail-panel" style="margin-bottom:16px">
+      <h3>Integrations (${t.integrations.length})</h3>
+      <div class="dp-pills">
+        ${t.integrations.map(i=>`<span class="dp-pill">${i}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="detail-panel">
+      <h3>Agents (${t.agents.length})</h3>
+      <div class="agents-list">
+        ${t.agents.map(a=>`
+          <div class="agent">
+            <div>
+              <div class="a-name">${a.n}</div>
+              <div class="a-desc">${a.d}</div>
+            </div>
+            ${a.o && a.o!=='—'?`<div class="a-opt">${a.o}</div>`:''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/* Master render */
+function render(){
+  renderSidebar();
+  if(currentStep === 1) renderStep1();
+  else if(currentStep === 2) renderStep2();
+  else if(currentStep === 3) renderStep3();
+  else if(currentStep === 4) renderStep4();
+}
+
+/* Init */
+renderSidebar();
+</script>
+</body>
+</html>
